@@ -1,0 +1,41 @@
+---
+title: "DSRT Notebook"
+output: html_notebook
+---
+
+R Notebook for displaying the DSRT Screen data and relevant analysis. 
+Set the working directory:
+```{r}
+setwd("DSRT_Screen_Code")
+```
+
+
+Import the neccesary functions:
+```{r}
+source("Utilities/Utility_package.R")
+source("Scripts/Drug_Synergy_Package.R")
+```
+
+
+Import the data:
+
+```{r}
+growth_effect_matrix = import_plate_range("Sample_Data/Sample_Excel_Template.xlsx", "N10:X16")
+```
+
+
+Print Heatmap Scaled:
+```{r}
+print_heatmap_bliss_scaled(growth_effect_matrix, export_name = "Sample_Output/Sample_Output_Scaled_Heatmap.jpg", xlabel = "Drug A", ylabel = "Drug B")
+```
+
+Print Heatmap Outlier:
+```{r}
+print_heatmap_bliss_outlier_elim(growth_effect_matrix, export_name = "Sample_Output/Sample_Output_Outlier_Heatmap.jpg", xlabel = "Drug A", ylabel = "Drug B")
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
