@@ -1767,14 +1767,7 @@ $(document).ready(function () {
 
 
 <!-- rnb-text-begin -->
-<p>R Notebook for displaying the DSRT Screen data and relevant analysis. Set the working directory:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0d2QoXCJDOi9Vc2Vycy9zZGdlby9Ecm9wYm94L093bi9Qcm9ncmFtbWluZy9EU1JUX0FuYWx5c2lzL0RTUlRfU2NyZWVuX0NvZGVcIilcbmBgYCJ9 -->
-<pre class="r"><code>setwd(&quot;C:/Users/sdgeo/Dropbox/Own/Programming/DSRT_Analysis/DSRT_Screen_Code&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
+<p>R Notebook for displaying the DSRT Screen data and relevant analysis.</p>
 <p>Import the neccesary functions:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
@@ -1807,8 +1800,10 @@ source(&quot;Scripts/Drug_Synergy_Package.R&quot;)</code></pre>
 <p>Print Heatmap Outlier:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnRfaGVhdG1hcF9ibGlzc19vdXRsaWVyX2VsaW0oZ3Jvd3RoX2VmZmVjdF9tYXRyaXgsIGV4cG9ydF9uYW1lID0gXCJTYW1wbGVfT3V0cHV0L1NhbXBsZV9PdXRwdXRfT3V0bGllcl9IZWF0bWFwLmpwZ1wiLCB4bGFiZWwgPSBcIkRydWcgQVwiLCB5bGFiZWwgPSBcIkRydWcgQlwiKVxuYGBgIn0= -->
-<pre class="r"><code>print_heatmap_bliss_outlier_elim(growth_effect_matrix, export_name = &quot;Sample_Output/Sample_Output_Outlier_Heatmap.jpg&quot;, xlabel = &quot;Drug A&quot;, ylabel = &quot;Drug B&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnRfaGVhdG1hcF9ibGlzc19vdXRsaWVyX2VsaW0oZ3Jvd3RoX2VmZmVjdF9tYXRyaXgsIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZXhwb3J0X25hbWUgPSBcIlNhbXBsZV9PdXRwdXQvU2FtcGxlX091dHB1dF9PdXRsaWVyX0hlYXRtYXAuanBnXCIsIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgeGxhYmVsID0gXCJEcnVnIEFcIiwgeWxhYmVsID0gXCJEcnVnIEJcIilcbmBgYCJ9 -->
+<pre class="r"><code>print_heatmap_bliss_outlier_elim(growth_effect_matrix, 
+                                 export_name = &quot;Sample_Output/Sample_Output_Outlier_Heatmap.jpg&quot;, 
+                                 xlabel = &quot;Drug A&quot;, ylabel = &quot;Drug B&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoibnVsbCBkZXZpY2UgXG4gICAgICAgICAgMSBcbiJ9 -->
 <pre><code>null device 
@@ -1816,12 +1811,23 @@ source(&quot;Scripts/Drug_Synergy_Package.R&quot;)</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Add a new chunk by clicking the <em>Insert Chunk</em> button on the toolbar or by pressing <em>Ctrl+Alt+I</em>.</p>
-<p>When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the <em>Preview</em> button or press <em>Ctrl+Shift+K</em> to preview the HTML file).</p>
-<p>The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike <em>Knit</em>, <em>Preview</em> does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.</p>
+<p>Pipeline Print Heatmap: Here we will show how to Analyze all the XLSX files in a single folder using the Pipeline utility. This version analyzes the files sequentially on one CPU</p>
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX1BpcGVsaW5lX091dHB1dFwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCxcbiAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwgXG4gICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gKFwiTjEwOlgxNlwiKSkgXG5gYGAifQ== -->
+<pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
+output_directory = toString(paste(getwd(),&quot;/Sample_Pipeline_Output&quot;,sep = &quot;&quot;))
+pipeline(pipelined_print_heatmap_growth_scaled,
+         input_directory, 
+         output_directory,
+         additional_args = (&quot;N10:X16&quot;)) </code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTlVMTFxuIn0= -->
+<pre><code>NULL</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRTUlQgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpSIE5vdGVib29rIGZvciBkaXNwbGF5aW5nIHRoZSBEU1JUIFNjcmVlbiBkYXRhIGFuZCByZWxldmFudCBhbmFseXNpcy4gDQpTZXQgdGhlIHdvcmtpbmcgZGlyZWN0b3J5Og0KYGBge3J9DQpzZXR3ZCgiRFNSVF9TY3JlZW5fQ29kZSIpDQpgYGANCg0KDQpJbXBvcnQgdGhlIG5lY2Nlc2FyeSBmdW5jdGlvbnM6DQpgYGB7cn0NCnNvdXJjZSgiVXRpbGl0aWVzL1V0aWxpdHlfcGFja2FnZS5SIikNCnNvdXJjZSgiU2NyaXB0cy9EcnVnX1N5bmVyZ3lfUGFja2FnZS5SIikNCmBgYA0KDQoNCkltcG9ydCB0aGUgZGF0YToNCg0KYGBge3J9DQpncm93dGhfZWZmZWN0X21hdHJpeCA9IGltcG9ydF9wbGF0ZV9yYW5nZSgiU2FtcGxlX0RhdGEvU2FtcGxlX0V4Y2VsX1RlbXBsYXRlLnhsc3giLCAiTjEwOlgxNiIpDQpgYGANCg0KDQpQcmludCBIZWF0bWFwIFNjYWxlZDoNCmBgYHtyfQ0KcHJpbnRfaGVhdG1hcF9ibGlzc19zY2FsZWQoZ3Jvd3RoX2VmZmVjdF9tYXRyaXgsIGV4cG9ydF9uYW1lID0gIlNhbXBsZV9PdXRwdXQvU2FtcGxlX091dHB1dF9TY2FsZWRfSGVhdG1hcC5qcGciLCB4bGFiZWwgPSAiRHJ1ZyBBIiwgeWxhYmVsID0gIkRydWcgQiIpDQpgYGANCg0KUHJpbnQgSGVhdG1hcCBPdXRsaWVyOg0KYGBge3J9DQpwcmludF9oZWF0bWFwX2JsaXNzX291dGxpZXJfZWxpbShncm93dGhfZWZmZWN0X21hdHJpeCwgZXhwb3J0X25hbWUgPSAiU2FtcGxlX091dHB1dC9TYW1wbGVfT3V0cHV0X091dGxpZXJfSGVhdG1hcC5qcGciLCB4bGFiZWwgPSAiRHJ1ZyBBIiwgeWxhYmVsID0gIkRydWcgQiIpDQpgYGANCg0KQWRkIGEgbmV3IGNodW5rIGJ5IGNsaWNraW5nIHRoZSAqSW5zZXJ0IENodW5rKiBidXR0b24gb24gdGhlIHRvb2xiYXIgb3IgYnkgcHJlc3NpbmcgKkN0cmwrQWx0K0kqLg0KDQpXaGVuIHlvdSBzYXZlIHRoZSBub3RlYm9vaywgYW4gSFRNTCBmaWxlIGNvbnRhaW5pbmcgdGhlIGNvZGUgYW5kIG91dHB1dCB3aWxsIGJlIHNhdmVkIGFsb25nc2lkZSBpdCAoY2xpY2sgdGhlICpQcmV2aWV3KiBidXR0b24gb3IgcHJlc3MgKkN0cmwrU2hpZnQrSyogdG8gcHJldmlldyB0aGUgSFRNTCBmaWxlKS4NCg0KVGhlIHByZXZpZXcgc2hvd3MgeW91IGEgcmVuZGVyZWQgSFRNTCBjb3B5IG9mIHRoZSBjb250ZW50cyBvZiB0aGUgZWRpdG9yLiBDb25zZXF1ZW50bHksIHVubGlrZSAqS25pdCosICpQcmV2aWV3KiBkb2VzIG5vdCBydW4gYW55IFIgY29kZSBjaHVua3MuIEluc3RlYWQsIHRoZSBvdXRwdXQgb2YgdGhlIGNodW5rIHdoZW4gaXQgd2FzIGxhc3QgcnVuIGluIHRoZSBlZGl0b3IgaXMgZGlzcGxheWVkLg0K</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRTUlQgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpSIE5vdGVib29rIGZvciBkaXNwbGF5aW5nIHRoZSBEU1JUIFNjcmVlbiBkYXRhIGFuZCByZWxldmFudCBhbmFseXNpcy4gDQoNCkltcG9ydCB0aGUgbmVjY2VzYXJ5IGZ1bmN0aW9uczoNCmBgYHtyfQ0Kc291cmNlKCJVdGlsaXRpZXMvVXRpbGl0eV9wYWNrYWdlLlIiKQ0Kc291cmNlKCJTY3JpcHRzL0RydWdfU3luZXJneV9QYWNrYWdlLlIiKQ0KYGBgDQoNCg0KSW1wb3J0IHRoZSBkYXRhOg0KDQpgYGB7cn0NCmdyb3d0aF9lZmZlY3RfbWF0cml4ID0gaW1wb3J0X3BsYXRlX3JhbmdlKCJTYW1wbGVfRGF0YS9TYW1wbGVfRXhjZWxfVGVtcGxhdGUueGxzeCIsICJOMTA6WDE2IikNCmBgYA0KDQoNClByaW50IEhlYXRtYXAgU2NhbGVkOg0KYGBge3J9DQpwcmludF9oZWF0bWFwX2JsaXNzX3NjYWxlZChncm93dGhfZWZmZWN0X21hdHJpeCwgZXhwb3J0X25hbWUgPSAiU2FtcGxlX091dHB1dC9TYW1wbGVfT3V0cHV0X1NjYWxlZF9IZWF0bWFwLmpwZyIsIHhsYWJlbCA9ICJEcnVnIEEiLCB5bGFiZWwgPSAiRHJ1ZyBCIikNCmBgYA0KDQpQcmludCBIZWF0bWFwIE91dGxpZXI6DQpgYGB7cn0NCnByaW50X2hlYXRtYXBfYmxpc3Nfb3V0bGllcl9lbGltKGdyb3d0aF9lZmZlY3RfbWF0cml4LCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGV4cG9ydF9uYW1lID0gIlNhbXBsZV9PdXRwdXQvU2FtcGxlX091dHB1dF9PdXRsaWVyX0hlYXRtYXAuanBnIiwgDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB4bGFiZWwgPSAiRHJ1ZyBBIiwgeWxhYmVsID0gIkRydWcgQiIpDQpgYGANCg0KUGlwZWxpbmUgUHJpbnQgSGVhdG1hcDoNCkhlcmUgd2Ugd2lsbCBzaG93IGhvdyB0byBBbmFseXplIGFsbCB0aGUgWExTWCBmaWxlcyBpbiBhIHNpbmdsZSBmb2xkZXIgdXNpbmcgdGhlIFBpcGVsaW5lIHV0aWxpdHkuDQpUaGlzIHZlcnNpb24gYW5hbHl6ZXMgdGhlIGZpbGVzIHNlcXVlbnRpYWxseSBvbiBvbmUgQ1BVDQoNCmBgYHtyfQ0KaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9EYXRhIixzZXAgPSAiIikpDQpvdXRwdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9QaXBlbGluZV9PdXRwdXQiLHNlcCA9ICIiKSkNCnBpcGVsaW5lKHBpcGVsaW5lZF9wcmludF9oZWF0bWFwX2dyb3d0aF9zY2FsZWQsDQogICAgICAgICBpbnB1dF9kaXJlY3RvcnksIA0KICAgICAgICAgb3V0cHV0X2RpcmVjdG9yeSwNCiAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9ICgiTjEwOlgxNiIpKSANCmBgYA==</div>
 
 
 

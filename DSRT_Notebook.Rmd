@@ -4,11 +4,6 @@ output: html_notebook
 ---
 
 R Notebook for displaying the DSRT Screen data and relevant analysis. 
-Set the working directory:
-```{r}
-setwd("DSRT_Screen_Code")
-```
-
 
 Import the neccesary functions:
 ```{r}
@@ -31,11 +26,20 @@ print_heatmap_bliss_scaled(growth_effect_matrix, export_name = "Sample_Output/Sa
 
 Print Heatmap Outlier:
 ```{r}
-print_heatmap_bliss_outlier_elim(growth_effect_matrix, export_name = "Sample_Output/Sample_Output_Outlier_Heatmap.jpg", xlabel = "Drug A", ylabel = "Drug B")
+print_heatmap_bliss_outlier_elim(growth_effect_matrix, 
+                                 export_name = "Sample_Output/Sample_Output_Outlier_Heatmap.jpg", 
+                                 xlabel = "Drug A", ylabel = "Drug B")
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+Pipeline Print Heatmap:
+Here we will show how to Analyze all the XLSX files in a single folder using the Pipeline utility.
+This version analyzes the files sequentially on one CPU
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Pipeline_Output",sep = ""))
+pipeline(pipelined_print_heatmap_growth_scaled,
+         input_directory, 
+         output_directory,
+         additional_args = ("N10:X16")) 
+```
