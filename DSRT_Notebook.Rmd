@@ -16,6 +16,7 @@ Import the data:
 
 ```{r}
 growth_effect_matrix = import_plate_range("Sample_Data/Sample_Excel_Template.xlsx", "N10:X16")
+print(growth_effect_matrix)
 ```
 
 
@@ -60,9 +61,12 @@ Calculate a bliss sum in a couple of different ways:
 ```{r}
 bliss_sum_scaled = calculate_bliss_sum_scaled(growth_effect_matrix)
 bliss_sum_outlier = calculate_bliss_sum_outlier_elim(growth_effect_matrix)
+print(bliss_sum_scaled)
+print(bliss_sum_outlier)
 ```
 
-Produce a .csv file with bliss sums for all items inside of a folder. Note, must be done sequentially since all sums point to the same file. 
+Produce a .csv file with bliss sums for all items inside of a folder. Note, must be done sequentially since all sums point to the same file.
+Very fast to produce however. 
 ```{r}
 input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
 output_directory = toString(paste(getwd(),"/Sample_Bliss_Sum",sep = ""))
