@@ -311,7 +311,7 @@ print_heatmap_bliss_outlier_elim <- function(growth_effect_matrix,export_name="d
   dev.off()
 }
 
-calculate_bliss_sum_scaled <- function(growth_effect_matrix,export_name="default_heatmap.csv",xlabel="x-Axis",ylabel="y-Axis") {
+calculate_bliss_sum_scaled <- function(growth_effect_matrix) {
   data_plate = bliss_calculator(growth_effect_matrix)
   for (i in 1:nrow(data_plate)) {
     for(j in 1:ncol(data_plate)) {
@@ -336,7 +336,7 @@ calculate_bliss_sum_scaled <- function(growth_effect_matrix,export_name="default
   return(bliss_sum)
 }
 
-calculate_bliss_sum_outlier_elim <- function(growth_effect_matrix,export_name="default_heatmap.csv",xlabel="x-Axis",ylabel="y-Axis") {
+calculate_bliss_sum_outlier_elim <- function(growth_effect_matrix) {
   data_plate = bliss_calculator(growth_effect_matrix)
   for (i in 1:nrow(data_plate)) {
     for(j in 1:ncol(data_plate)) {

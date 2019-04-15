@@ -41,5 +41,33 @@ output_directory = toString(paste(getwd(),"/Sample_Pipeline_Output",sep = ""))
 pipeline(pipelined_print_heatmap_growth_scaled,
          input_directory, 
          output_directory,
-         additional_args = ("N10:X16")) 
+         additional_args = c("N10:X16")) 
+```
+
+This version runs the same analysis, but in parallel on all available CPU cores. Analyzes one sheet per core. 
+```{r}
+input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Pipeline_Output",sep = ""))
+pipeline(pipelined_print_heatmap_growth_scaled,
+         input_directory, 
+         output_directory,
+         additional_args = c("N10:X16"),
+         parallel_run = TRUE,
+         environment = lsf.str()) 
+```
+
+Calculate a bliss sum in a couple of different ways:
+```{r}
+bliss_sum_scaled = calculate_bliss_sum_scaled(growth_effect_matrix)
+bliss_sum_outlier = calculate_bliss_sum_outlier_elim(growth_effect_matrix)
+```
+
+Produce a .csv file with bliss sums for all items inside of a folder. Note, must be done sequentially since all sums point to the same file. 
+```{r}
+input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Bliss_Sum",sep = ""))
+pipeline(pipelined_print_bliss_sum_growth_scaled,
+         input_directory, 
+         output_directory,
+         additional_args = c("N10:X16","Bliss_Sum_Scaled.csv")) 
 ```
