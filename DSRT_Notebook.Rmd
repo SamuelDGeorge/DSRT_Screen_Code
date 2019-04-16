@@ -75,3 +75,18 @@ pipeline(pipelined_print_bliss_sum_growth_scaled,
          output_directory,
          additional_args = c("N10:X16","Bliss_Sum_Scaled.csv")) 
 ```
+
+
+Run Analysis on all files of a certain type within a directory. Note that the directory is created dynamically if it doesn't exit. 
+```{r}
+source("Utilities/Utility_package.R")
+input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Recursive_Output",sep = ""))
+pipeline_folder_recursive(pipelined_print_heatmap_growth_scaled,
+                          input_directory,
+                          output_directory,
+                          additional_args = c("N10:X16"),
+                          file_type = "xlsx",
+                          cores = 8,
+                          environment = lsf.str())
+```

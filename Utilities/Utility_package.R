@@ -11,12 +11,9 @@ if (!require("stringr")) {
 require(parallel)
 
 ## This function is described in "CrisprFunctionScripts.R"
-collect_file_vector <- function(FolderPath) {
-  files <- list.files(FolderPath) 
-  dirs <- list.dirs(FolderPath, full.names = FALSE)
-  dirs = dirs[-1]
-  list_items = setdiff(files,dirs)
-  return(list_items)
+collect_file_vector <- function(FolderPath, file_type) {
+  files <- list_files_with_exts(FolderPath, file_type, full.names = FALSE)
+  return(files)
 }
 
 ## A pipeline Function. Takes all files within a folder, performs the function
@@ -25,8 +22,8 @@ collect_file_vector <- function(FolderPath) {
 ## function(fileInputName,fileOutputName)
 ## additional arguments can be added as a vector (***coerced to a string when given as arguments!)
 
-run_parallel <- function(Function_to_perform, input_location, additional_args = c(), cores = 8, environment = lsf.str()) {
-  files <- collect_file_vector(input_location)
+run_parallel <- function(Function_to_perform, input_location, additional_args = c(), file_types = "xlsx",cores = 8, environment = lsf.str()) {
+  files <- collect_file_vector(input_location, file_types)
   inputs <- c()
   outputs <- c()
   for (i in 1:length(files)) {
@@ -58,8 +55,8 @@ run_parallel <- function(Function_to_perform, input_location, additional_args = 
   return(result)
 }
 
-run_sequential <- function(Function_to_perform, input_location, additional_args = c()) {
-  files <- collect_file_vector(input_location)
+run_sequential <- function(Function_to_perform, input_location, additional_args = c(), file_types = "xlsx") {
+  files <- collect_file_vector(input_location, file_types)
   result = c()
   for (i in 1:length(files)) {
     InputFile = paste(input_location,"/",sep = "")
@@ -72,33 +69,52 @@ run_sequential <- function(Function_to_perform, input_location, additional_args 
   }
 }
 
-pipeline <- function(Function_to_perform, input_location, output_location, additional_args = c(), parallel_run = FALSE, environment = lsf.str(), cores = 8) {
+pipeline <- function(Function_to_perform, input_location, output_location, additional_args = c(), file_types = "xlsx",parallel_run = FALSE, cores = 8, environment = lsf.str()) {
   wd <- getwd()
   setwd(output_location)
   result = c()
   if (parallel_run) {
-    result = run_parallel(Function_to_perform, input_location, additional_args, cores, environment)
+    result = run_parallel(Function_to_perform, input_location, additional_args, file_types, cores, environment)
   } else {
-    result = run_sequential(Function_to_perform, input_location, additional_args)
+    result = run_sequential(Function_to_perform, input_location, additional_args, file_types)
   }
   setwd(wd) ## set the wd back to the starting wd, had to change to the output_location
   return(result)
 }
 
-pipeline_with_finish_function <- function(Function_to_perform, finish_function,input_location, output_location, func_one_additional_args = c(), func_two_args = c(), parallel_run = FALSE, environment = lsf.str()) {
+pipeline_with_finish_function <- function(Function_to_perform, finish_function,input_location, output_location, func_one_additional_args = c(), func_two_args = c(), file_types = "xlsx", parallel_run = FALSE, cores = 8, environment = lsf.str()) {
   wd <- getwd()
   setwd(output_location)
   result = c()
   if (parallel_run) {
-    result = run_parallel(Function_to_perform, input_location, func_one_additional_args, environment)
+    result = run_parallel(Function_to_perform, input_location, func_one_additional_args, file_types, cores, environment)
   } else {
-    result = run_sequential(Function_to_perform, input_location, func_one_additional_args)
+    result = run_sequential(Function_to_perform, input_location, func_one_additional_args, file_types)
   }
   
   result = do.call(finish_function,as.list(func_two_args))
   setwd(wd) ## set the wd back to the starting wd, had to change to the output_location
   return(result)
 }
+
+pipeline_folder_recursive <- function(Function_to_perform, highest_level_input, highest_level_output, additional_args = c(), file_types = ".xlsx", parallel_run = FALSE, cores = 8, environment = lsf.str()){
+  
+  input_folders <- list.dirs(highest_level_input, full.names = FALSE)
+  input_files <- list.files(highest_level_input)
+  for (i in input_folders){
+    #Have the input directory
+    input_directory = paste(highest_level_input,i,sep = "/")
+    
+    #Make output directory if it doesn't exist
+    output_directory = paste(highest_level_output,i,sep="/")
+    dir.create(output_directory, showWarnings = FALSE)
+    pipeline(Function_to_perform, input_directory, output_directory, additional_args, file_types, parallel_run, cores, environment)
+    
+  }
+  
+}
+
+
 
 
 
