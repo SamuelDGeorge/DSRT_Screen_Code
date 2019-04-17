@@ -163,7 +163,6 @@ run_sequential_combine <- function(Function_to_perform, input_location, root_dir
     OutputName = OutputName[[1]][1]
     if (!identical(root_append,"")){OutputName = paste(root_append,OutputName,sep = "-")}
     OutputName = str_replace(OutputName, "/", "-")
-    print(OutputName)
     args = c(InputFile,OutputName)
     args = c(args,additional_args)
     result = c(result, do.call(Function_to_perform,as.list(args)))
