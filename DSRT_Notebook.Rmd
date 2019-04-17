@@ -108,7 +108,6 @@ pipeline_folder_recursive(pipelined_print_heatmap_growth_scaled,
 Run all analysis and place the files into a main folder that contains all the nested files.
 Can run in parallel or sequentially. Note only the analysis in individual folders is run in parallel
 ```{r}
-source("Utilities/Utility_package.R")
 input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
 output_directory = toString(paste(getwd(),"/Sample_Recursive_Combined",sep = ""))
 pipeline_folder_combine(pipelined_print_heatmap_growth_scaled,
