@@ -127,6 +127,7 @@ run_parallel_combine <- function(Function_to_perform, input_location, root_direc
     if (!identical(root_append,"")){OutputName = paste(root_append,OutputName,sep = "-")}
     outputs <- c(outputs,OutputName)
   }
+  print(files)
   core_count = detectCores()
   cores_to_use = 1
   if (core_count < cores){
