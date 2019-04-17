@@ -115,7 +115,7 @@ pipeline_folder_combine(pipelined_print_heatmap_growth_outlier_elim,
                           output_directory,
                           additional_args = c("N10:X16"),
                           file_type = "xlsx",
-                          parallel_run = FALSE,
+                          parallel_run = TRUE,
                           cores = 8,
                           environment = lsf.str())
 ```
