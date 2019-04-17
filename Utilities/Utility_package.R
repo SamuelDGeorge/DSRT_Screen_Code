@@ -100,7 +100,6 @@ pipeline_with_finish_function <- function(Function_to_perform, finish_function,i
 pipeline_folder_recursive <- function(Function_to_perform, highest_level_input, highest_level_output, additional_args = c(), file_types = ".xlsx", parallel_run = FALSE, cores = 8, environment = lsf.str()){
   
   input_folders <- list.dirs(highest_level_input, full.names = FALSE)
-  input_files <- list.files(highest_level_input)
   for (i in input_folders){
     #Have the input directory
     input_directory = paste(highest_level_input,i,sep = "/")
@@ -112,6 +111,82 @@ pipeline_folder_recursive <- function(Function_to_perform, highest_level_input, 
     
   }
   
+}
+
+run_parallel_combine <- function(Function_to_perform, input_location, root_directory, additional_args = c(), file_types = "xlsx",cores = 8, environment = lsf.str()) {
+  files <- collect_file_vector(input_location, file_types)
+  inputs <- c()
+  outputs <- c()
+  root_append = str_replace(root_directory, "/", "-")
+  for (i in 1:length(files)) {
+    InputFile = paste(input_location,"/",sep = "")
+    InputFile = paste(InputFile,files[i],sep = "")
+    inputs <- c(inputs,InputFile)
+    OutputName = str_split(files[i],pattern = "[.]")
+    OutputName = OutputName[[1]][1]
+    if (!identical(root_append,"")){OutputName = paste(root_append,OutputName,sep = "-")}
+    outputs <- c(outputs,OutputName)
+  }
+  core_count = detectCores()
+  cores_to_use = 1
+  if (core_count < cores){
+    cores_to_use = core_count
+  } else {
+    cores_to_use = cores
+  }
+  print(cat("Running task on", cores_to_use, "cores\n", sep = " "))
+  if(.Platform$OS.type == "windows") {
+    c1 = makeCluster(cores_to_use)
+    clusterExport(c1,varlist = as.vector(environment))
+    result = clusterMap(c1,Function_to_perform, as.list(inputs), as.list(outputs), MoreArgs = as.list(additional_args))
+    stopCluster(c1)
+  } else {
+    result = mcmapply(Function_to_perform,as.list(inputs),as.list(outputs), MoreArgs = as.list(additional_args), mc.cores = cores_to_use)
+  }  
+  
+  return(result)
+}
+
+run_sequential_combine <- function(Function_to_perform, input_location, root_directory, additional_args = c(), file_types = "xlsx") {
+  files <- collect_file_vector(input_location, file_types)
+  result = c()
+  root_append = str_replace(root_directory, "/", "-")
+  for (i in 1:length(files)) {
+    InputFile = paste(input_location,"/",sep = "")
+    InputFile = paste(InputFile,files[i],sep = "")
+    OutputName = str_split(files[i],pattern = "[.]")
+    OutputName = OutputName[[1]][1]
+    if (!identical(root_append,"")){OutputName = paste(root_append,OutputName,sep = "-")}
+    args = c(InputFile,OutputName)
+    args = c(args,additional_args)
+    result = c(result, do.call(Function_to_perform,as.list(args)))
+  }
+}
+
+pipeline_combine <- function(Function_to_perform, input_location, root_directory,additional_args = c(), file_types = "xlsx",parallel_run = FALSE, cores = 8, environment = lsf.str()) {
+
+  result = c()
+  if (parallel_run) {
+    result = run_parallel_combine(Function_to_perform, input_location, root_directory, additional_args, file_types, cores, environment)
+  } else {
+    result = run_sequential_combine(Function_to_perform, input_location, root_directory,additional_args, file_types)
+  }
+  return(result)
+}
+
+pipeline_folder_combine <- function(Function_to_perform, highest_level_input, highest_level_output, additional_args = c(), file_types = ".xlsx", parallel_run = FALSE, cores = 8, environment = lsf.str()){
+  wd <- getwd()
+  dir.create(highest_level_output, showWarnings = FALSE)
+  setwd(highest_level_output)
+  
+  input_folders <- list.dirs(highest_level_input, full.names = FALSE)
+  for (i in input_folders){
+    #Have the input directory
+    input_directory = paste(highest_level_input,i,sep = "/")
+    pipeline_combine(Function_to_perform, input_directory, i,additional_args, file_types, parallel_run, cores, environment)
+    
+  }
+  setwd(wd) ## set the wd back to the starting wd, had to change to the output_location
 }
 
 
