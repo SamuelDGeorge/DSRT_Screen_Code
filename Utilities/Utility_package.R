@@ -24,6 +24,7 @@ collect_file_vector <- function(FolderPath, file_type) {
 
 run_parallel <- function(Function_to_perform, input_location, additional_args = c(), file_types = "xlsx",cores = 8, environment = lsf.str()) {
   files <- collect_file_vector(input_location, file_types)
+  if(length(files) == 0){return()}
   inputs <- c()
   outputs <- c()
   for (i in 1:length(files)) {
@@ -57,6 +58,7 @@ run_parallel <- function(Function_to_perform, input_location, additional_args = 
 
 run_sequential <- function(Function_to_perform, input_location, additional_args = c(), file_types = "xlsx") {
   files <- collect_file_vector(input_location, file_types)
+  if(length(files) == 0){return()}
   result = c()
   for (i in 1:length(files)) {
     InputFile = paste(input_location,"/",sep = "")
@@ -115,6 +117,7 @@ pipeline_folder_recursive <- function(Function_to_perform, highest_level_input, 
 
 run_parallel_combine <- function(Function_to_perform, input_location, root_directory, additional_args = c(), file_types = "xlsx",cores = 8, environment = lsf.str()) {
   files <- collect_file_vector(input_location, file_types)
+  if(length(files) == 0){return()}
   inputs <- c()
   outputs <- c()
   root_append = str_replace(root_directory, "/", "-")
@@ -125,9 +128,9 @@ run_parallel_combine <- function(Function_to_perform, input_location, root_direc
     OutputName = str_split(files[i],pattern = "[.]")
     OutputName = OutputName[[1]][1]
     if (!identical(root_append,"")){OutputName = paste(root_append,OutputName,sep = "-")}
+    OutputName = str_replace(OutputName, "/", "-")
     outputs <- c(outputs,OutputName)
   }
-  print(files)
   core_count = detectCores()
   cores_to_use = 1
   if (core_count < cores){
@@ -150,6 +153,7 @@ run_parallel_combine <- function(Function_to_perform, input_location, root_direc
 
 run_sequential_combine <- function(Function_to_perform, input_location, root_directory, additional_args = c(), file_types = "xlsx") {
   files <- collect_file_vector(input_location, file_types)
+  if(length(files) == 0){return()}
   result = c()
   root_append = str_replace(root_directory, "/", "-")
   for (i in 1:length(files)) {
@@ -158,6 +162,8 @@ run_sequential_combine <- function(Function_to_perform, input_location, root_dir
     OutputName = str_split(files[i],pattern = "[.]")
     OutputName = OutputName[[1]][1]
     if (!identical(root_append,"")){OutputName = paste(root_append,OutputName,sep = "-")}
+    OutputName = str_replace(OutputName, "/", "-")
+    print(OutputName)
     args = c(InputFile,OutputName)
     args = c(args,additional_args)
     result = c(result, do.call(Function_to_perform,as.list(args)))
@@ -183,6 +189,7 @@ pipeline_folder_combine <- function(Function_to_perform, highest_level_input, hi
   input_folders <- list.dirs(highest_level_input, full.names = FALSE)
   for (i in input_folders){
     #Have the input directory
+    #print(i)
     input_directory = paste(highest_level_input,i,sep = "/")
     pipeline_combine(Function_to_perform, input_directory, i,additional_args, file_types, parallel_run, cores, environment)
     

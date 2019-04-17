@@ -110,7 +110,7 @@ Can run in parallel or sequentially. Note only the analysis in individual folder
 ```{r}
 input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
 output_directory = toString(paste(getwd(),"/Sample_Recursive_Combined",sep = ""))
-pipeline_folder_combine(pipelined_print_heatmap_growth_scaled,
+pipeline_folder_combine(pipelined_print_heatmap_growth_outlier_elim,
                           input_directory,
                           output_directory,
                           additional_args = c("N10:X16"),

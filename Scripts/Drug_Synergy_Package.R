@@ -277,7 +277,6 @@ print_heatmap_bliss_scaled <- function(growth_effect_matrix,export_name="default
 print_heatmap_bliss_outlier_elim <- function(growth_effect_matrix,export_name="default_heatmap.jpg",xlabel="x-Axis",ylabel="y-Axis") {
   data_plate = bliss_calculator(growth_effect_matrix)
   color_range = 399
-  
   jpeg(filename=export_name,res=600,height = 12,width = 12,units = "in")
   
   Synergy <- colorRampPalette(c("red","white","Blue"))(n = color_range)
