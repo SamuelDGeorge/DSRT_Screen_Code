@@ -344,24 +344,27 @@ Combine_Synergy_Files_CSV <- function(Input_Directory, Output_Directory, Output_
 
 #Functions for the pipeline function to use
 pipelined_Logistic_Curves <- function(InputFilePath, OutputFileName, data_location, Normalize = TRUE, Viability_Data = TRUE, num_param = "all") {
-  data_frames <- build_data_frame(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
+  data_frames <- try(build_data_frame(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
                                   Normalize = Normalize, Drug_A = "Drug_A", Drug_B = "Drug_B",
-                                  Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1)
-  print_logistic_function(data_frames, Logistic_Output_Folder = NULL, num_param_logistic = num_param, filename = paste(OutputFileName, "_Logistic", sep = ""))
+                                  Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1))
+    
+  try(print_logistic_function(data_frames, Logistic_Output_Folder = NULL, num_param_logistic = num_param, filename = paste(OutputFileName, "_Logistic", sep = "")))
+
+
 }
 
 pipelined_Inflection_Curves <- function(InputFilePath, OutputFileName, data_location, Normalize = TRUE, Viability_Data = TRUE, num_param = "all") {
-  data_frames <- build_data_frame(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
+  data_frames <- try(build_data_frame(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
                                   Normalize = Normalize, Drug_A = "Drug_A", Drug_B = "Drug_B",
-                                  Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1)
-  print_logistic_inflection_points(data_frames, Inflection_Output_Folder = NULL, num_param_logistic = num_param, filename = paste(OutputFileName, "_Inflection", sep = ""))
+                                  Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1))
+  try(print_logistic_inflection_points(data_frames, Inflection_Output_Folder = NULL, num_param_logistic = num_param, filename = paste(OutputFileName, "_Inflection", sep = "")))
 }
 
 pipelined_Synergy_Graphs <- function(InputFilePath, OutputFileName, data_location, synergy_type = "Bliss", Normalize = TRUE, Viability_Data = TRUE) {
-  data_frames <- build_data_frame(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
+  data_frames <- try(build_data_frame(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
                                   Normalize = Normalize, Drug_A = "Drug_A", Drug_B = "Drug_B",
-                                  Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1)
-  synergy_analysis(input_data_frame = data_frames, synergy_type = synergy_type, filename = paste(OutputFileName, "_Synergy", sep = ""),Output_Folder = NULL)
+                                  Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1))
+  try(synergy_analysis(input_data_frame = data_frames, synergy_type = synergy_type, filename = paste(OutputFileName, "_Synergy", sep = ""),Output_Folder = NULL))
   if (file.exists("Rplots.pdf")){file.remove("Rplots.pdf")}
 }
 
