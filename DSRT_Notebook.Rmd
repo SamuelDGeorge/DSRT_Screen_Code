@@ -3,16 +3,20 @@ title: "DSRT Notebook"
 output: html_notebook
 ---
 
+# R Notebook for Analyzing Synergy
 R Notebook for displaying the DSRT Screen data and relevant analysis. 
 
+
+## Setup Environment
 Import the neccesary functions:
 ```{r}
 source("Utilities/Utility_package.R")
 source("Scripts/Drug_Synergy_Package.R")
+source("Scripts/Drug_Logistic_Package.R")
 ```
 
 
-Import the data:
+## Import Data
 
 ```{r}
 growth_effect_matrix = import_plate_range("Sample_Data/Sample_Excel_Template.xlsx", "N10:X16")
@@ -20,35 +24,40 @@ print(growth_effect_matrix)
 ```
 
 
+## Basic Heatmap Functions
+
 Print Heatmap Scaled:
 ```{r}
-print_heatmap_bliss_scaled(growth_effect_matrix, export_name = "Sample_Output/Sample_Output_Scaled_Heatmap.jpg", xlabel = "Drug A", ylabel = "Drug B")
+print_heatmap_bliss_scaled(growth_effect_matrix, export_name = "Sample_Outputs/Sample_Output/Sample_Output_Scaled_Heatmap.jpg", xlabel = "Drug A", ylabel = "Drug B")
 ```
 
 Print Heatmap Outlier:
 ```{r}
 print_heatmap_bliss_outlier_elim(growth_effect_matrix, 
-                                 export_name = "Sample_Output/Sample_Output_Outlier_Heatmap.jpg", 
+                                 export_name = "Sample_Outputs/Sample_Output/Sample_Output_Outlier_Heatmap.jpg",
                                  xlabel = "Drug A", ylabel = "Drug B")
 ```
 
-Pipeline Print Heatmap:
+## Basic Pipeline Functionality
+
 Here we will show how to Analyze all the XLSX files in a single folder using the Pipeline utility.
 This version analyzes the files sequentially on one CPU
 
 ```{r}
 input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
-output_directory = toString(paste(getwd(),"/Sample_Pipeline_Output",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Pipeline_Output",sep = ""))
 pipeline(pipelined_print_heatmap_growth_scaled,
          input_directory, 
          output_directory,
-         additional_args = c("N10:X16")) 
+         additional_args = c("N10:X16"),
+         parallel_run = FALSE,
+         environment = lsf.str()) 
 ```
 
 This version runs the same analysis, but in parallel on all available CPU cores. Analyzes one sheet per core. 
 ```{r}
 input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
-output_directory = toString(paste(getwd(),"/Sample_Pipeline_Output",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Pipeline_Output",sep = ""))
 pipeline(pipelined_print_heatmap_growth_scaled,
          input_directory, 
          output_directory,
@@ -56,6 +65,8 @@ pipeline(pipelined_print_heatmap_growth_scaled,
          parallel_run = TRUE,
          environment = lsf.str()) 
 ```
+
+## Basic Bliss Sum
 
 Calculate a bliss sum in a couple of different ways:
 ```{r}
@@ -65,22 +76,27 @@ print(bliss_sum_scaled)
 print(bliss_sum_outlier)
 ```
 
+## Bliss Sum Pipeline
+
 Produce a .csv file with bliss sums for all items inside of a folder. Note, must be done sequentially since all sums point to the same file.
 Very fast to produce however. 
 ```{r}
 input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
-output_directory = toString(paste(getwd(),"/Sample_Bliss_Sum",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Bliss_Sum",sep = ""))
 pipeline(pipelined_print_bliss_sum_growth_scaled,
          input_directory, 
          output_directory,
-         additional_args = c("N10:X16","Bliss_Sum_Scaled.csv")) 
+         additional_args = c("N10:X16","Bliss_Sum_Scaled.csv"),
+         parallel_run = FALSE,
+         environment = lsf.str()) 
 ```
 
+## Recursive Pipeline 
 
 Run Analysis on all files of a certain type within a directory. Note that the directory is created dynamically if it doesn't exit. 
 ```{r}
 input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
-output_directory = toString(paste(getwd(),"/Sample_Recursive_Output",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Recursive_Output",sep = ""))
 pipeline_folder_recursive(pipelined_print_heatmap_growth_scaled,
                           input_directory,
                           output_directory,
@@ -109,7 +125,7 @@ Run all analysis and place the files into a main folder that contains all the ne
 Can run in parallel or sequentially. Note only the analysis in individual folders is run in parallel
 ```{r}
 input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
-output_directory = toString(paste(getwd(),"/Sample_Recursive_Combined",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Recursive_Combined",sep = ""))
 pipeline_folder_combine(pipelined_print_heatmap_growth_outlier_elim,
                           input_directory,
                           output_directory,
@@ -119,3 +135,112 @@ pipeline_folder_combine(pipelined_print_heatmap_growth_outlier_elim,
                           cores = 8,
                           environment = lsf.str())
 ```
+
+
+# Synergy Functions using BioC
+
+Thanks Clint for making this part!
+
+## Import the Data as a Synergy Data Frame
+
+input_file should be an xlsx file and the range defines where the growth data is at.
+```{r}
+input_file = "Sample_Data/Sample_Excel_Template.xlsx"
+data_frames <- build_data_frame(input_file, range="N10:X16", Viability_Data = TRUE, 
+                                Normalize = TRUE, Drug_A = "Docetaxel", Drug_B = "Luminespib",
+                                Cell_Line = "Mia-PaCa-2", Conc_A = "uM", Conc_B = "uM", replicate = 1)
+```
+
+## Print Logistic Curves and Inflection Points
+
+Note if Filename is left NULL it uses the name built into the data_frame above.
+```{r}
+print_logistic_function(data_frames, 
+                        Logistic_Output_Folder = "Sample_Outputs/Sample_Logistic_Curves",
+                        num_param_logistic = "all", filename = NULL)
+
+```
+
+Note if Filename is left NULL it uses the name built into the data_frame above.
+```{r}
+print_logistic_inflection_points(data_frames, 
+                                 Inflection_Output_Folder = "Sample_Outputs/Sample_Inflection_Points",
+                                 num_param_logistic = "all", filename = NULL)
+```
+
+
+## Print a Synergy Map
+
+synergy_type can be: "HSA", "Loewe", "Bliss", or "ZIP" synergy method *ZIP combines the assumptions of both Loewe and Bliss models*
+```{r}
+synergy_analysis(data_frames, synergy_type = "Bliss", Output_Folder = "Sample_Outputs/Sample_Synergy",
+                           filename = NULL)
+```
+
+## Pipeline Synergy Functions
+
+Logistic Pipeline:
+```{r}
+input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Logistic_Combine",sep = ""))
+pipeline_folder_combine(pipelined_Logistic_Curves,
+                          input_directory,
+                          output_directory,
+                          additional_args = c("N10:X16", TRUE, TRUE, "all"),
+                          file_type = "xlsx",
+                          parallel_run = TRUE,
+                          cores = 8,
+                          environment = lsf.str())
+```
+
+Inflection Pipeline:
+```{r}
+input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Inflection_Combine",sep = ""))
+pipeline_folder_combine(pipelined_Inflection_Curves,
+                          input_directory,
+                          output_directory,
+                          additional_args = c("N10:X16", TRUE, TRUE, "all"),
+                          file_type = "xlsx",
+                          parallel_run = TRUE,
+                          cores = 8,
+                          environment = lsf.str())
+```
+
+Graph Pipeline:
+```{r}
+input_directory = toString(paste(getwd(),"/Sample_Data",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Synergy_Combine",sep = ""))
+pipeline_folder_combine(pipelined_Synergy_Graphs,
+                          input_directory,
+                          output_directory,
+                          additional_args = c("N10:X16", "Bliss", TRUE, TRUE),
+                          file_type = "xlsx",
+                          parallel_run = FALSE,
+                          cores = 8,
+                          environment = lsf.str())
+```
+
+
+## Combine Synergy Files
+
+Here we combine the files in the synergy folder into one dataframe.
+Works specifically for a directory full of CSV files that were produced in the above. 
+
+```{r}
+Input_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Synergy_Combine",sep = ""))
+combined_frame = Combine_Synergy_Files(Input_directory)
+```
+
+Here we can combine the files and reprint a CSV of the combined files. 
+if remove_csv is true, then destroy the file after reading it. 
+```{r}
+Input_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Synergy_Combine",sep = ""))
+Output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_Synergy_Combine/Combined_Synergy",sep = ""))
+Combine_Synergy_Files_CSV(Input_directory,
+                          Output_directory,
+                          Output_Filename = "Combined_Synergy",
+                          allow_overwrite = FALSE,
+                          remove_csv = TRUE)
+```
+

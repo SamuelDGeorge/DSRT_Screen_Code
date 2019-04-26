@@ -1767,39 +1767,56 @@ $(document).ready(function () {
 
 
 <!-- rnb-text-begin -->
+<div id="r-notebook-for-analyzing-synergy" class="section level1">
+<h1>R Notebook for Analyzing Synergy</h1>
 <p>R Notebook for displaying the DSRT Screen data and relevant analysis.</p>
+<div id="setup-environment" class="section level2">
+<h2>Setup Environment</h2>
 <p>Import the neccesary functions:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiVXRpbGl0aWVzL1V0aWxpdHlfcGFja2FnZS5SXCIpXG5zb3VyY2UoXCJTY3JpcHRzL0RydWdfU3luZXJneV9QYWNrYWdlLlJcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiVXRpbGl0aWVzL1V0aWxpdHlfcGFja2FnZS5SXCIpXG5zb3VyY2UoXCJTY3JpcHRzL0RydWdfU3luZXJneV9QYWNrYWdlLlJcIilcbnNvdXJjZShcIlNjcmlwdHMvRHJ1Z19Mb2dpc3RpY19QYWNrYWdlLlJcIilcbmBgYCJ9 -->
 <pre class="r"><code>source(&quot;Utilities/Utility_package.R&quot;)
-source(&quot;Scripts/Drug_Synergy_Package.R&quot;)</code></pre>
+source(&quot;Scripts/Drug_Synergy_Package.R&quot;)
+source(&quot;Scripts/Drug_Logistic_Package.R&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Import the data:</p>
+</div>
+<div id="import-data" class="section level2">
+<h2>Import Data</h2>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ3Jvd3RoX2VmZmVjdF9tYXRyaXggPSBpbXBvcnRfcGxhdGVfcmFuZ2UoXCJTYW1wbGVfRGF0YS9TYW1wbGVfRXhjZWxfVGVtcGxhdGUueGxzeFwiLCBcIk4xMDpYMTZcIilcbnByaW50KGdyb3d0aF9lZmZlY3RfbWF0cml4KVxuYGBgIn0= -->
 <pre class="r"><code>growth_effect_matrix = import_plate_range(&quot;Sample_Data/Sample_Excel_Template.xlsx&quot;, &quot;N10:X16&quot;)
 print(growth_effect_matrix)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgIDAgOS43NjU2MjVFLTMgMS45NTMxMjVFLTIgMy45MDYyNUUtMiA3LjgxMjVFLTIgICAwLjE1NjI1ICAgIDAuMzEyNSAgICAgIDAuNjI1ICAgICAgMS4yNSAgICAgICAgMi41XG4wICAgIDEuMDAwMDAwMCAgIDAuOTI1MzI4NyAgIDAuOTQ0MjM3NCAgMC45MDI3Nzk2IDAuNzkzMjg4OCAwLjU2NzIxOTIgMC4zNTAyMDc3IDAuMTk4NjE2NjQgMC4xNTMwNjg3IDAuMTE2Mjc5MDdcbjAuMDEgMS4xMTU3ODY1ICAgMC45MzE5NDU3ICAgMC44NTk5Mjk4ICAwLjcxNzcxODEgMC41OTU3MDAwIDAuNDMwMDE4NCAwLjI0NDQwMDIgMC4xOTAwMDgxNCAwLjE0ODE0MzQgMC4xMzYwNjU3OFxuMC4wMiAxLjEzODM3ODUgICAwLjc5MTg3NTUgICAwLjcyMjUxNDkgIDAuNjAyMzM4NCAwLjQ1MjEzOTMgMC4zNTkwMzA0IDAuMjM2MjQxNCAwLjE3MjU3Njk4IDAuMTUyMjMzNSAwLjEyOTcyNzE4XG4wLjA0IDAuOTA0MzAwMCAgIDAuNjIxODY4MiAgIDAuNTQxNjI5MiAgMC40MTkyNjg1IDAuMzU0NzQ3NSAwLjI2NDQ4NjcgMC4xOTI3Mjc3IDAuMTM3MzUwNjQgMC4xMzU3NjYwIDAuMTMwMTk4MzBcbjAuMDggMC43MDI0OTI2ICAgMC41MzQzNjk4ICAgMC40MjgwNDgzICAwLjMyMDkzNDUgMC4yOTgwMjEzIDAuMjA5Nzk0OSAwLjE0NjYwMTYgMC4xMjkzNDE3MyAwLjExMjI5NjAgMC4xMjYzNDM3NFxuMC4xNiAwLjUzNzU4MTkgICAwLjM1MDI3MjAgICAwLjMwMzQzOTEgIDAuMjU4MTI2NyAwLjE5NzQzODkgMC4xNjYwMjQyIDAuMTI1NjE1NyAwLjA5ODMzMzk4IDAuMTA3NzM0OCAwLjA5MTUwMjg1XG4ifQ== -->
-<pre><code>             0 9.765625E-3 1.953125E-2 3.90625E-2 7.8125E-2   0.15625    0.3125      0.625      1.25        2.5
-0    1.0000000   0.9253287   0.9442374  0.9027796 0.7932888 0.5672192 0.3502077 0.19861664 0.1530687 0.11627907
-0.01 1.1157865   0.9319457   0.8599298  0.7177181 0.5957000 0.4300184 0.2444002 0.19000814 0.1481434 0.13606578
-0.02 1.1383785   0.7918755   0.7225149  0.6023384 0.4521393 0.3590304 0.2362414 0.17257698 0.1522335 0.12972718
-0.04 0.9043000   0.6218682   0.5416292  0.4192685 0.3547475 0.2644867 0.1927277 0.13735064 0.1357660 0.13019830
-0.08 0.7024926   0.5343698   0.4280483  0.3209345 0.2980213 0.2097949 0.1466016 0.12934173 0.1122960 0.12634374
-0.16 0.5375819   0.3502720   0.3034391  0.2581267 0.1974389 0.1660242 0.1256157 0.09833398 0.1077348 0.09150285</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiICAgICAgICAgICAgIDAgOS43NjU2MjVFLTMgMS45NTMxMjVFLTIgMy45MDYyNUUtMiA3LjgxMjVFLTIgICAwLjE1NjI1ICAgIDAuMzEyNSAgICAgIDAuNjI1ICAgICAgMS4yNVxuMCAgICAxLjAwMDAwMDAgICAwLjkyNTMyODcgICAwLjk0NDIzNzQgIDAuOTAyNzc5NiAwLjc5MzI4ODggMC41NjcyMTkyIDAuMzUwMjA3NyAwLjE5ODYxNjY0IDAuMTUzMDY4N1xuMC4wMSAxLjExNTc4NjUgICAwLjkzMTk0NTcgICAwLjg1OTkyOTggIDAuNzE3NzE4MSAwLjU5NTcwMDAgMC40MzAwMTg0IDAuMjQ0NDAwMiAwLjE5MDAwODE0IDAuMTQ4MTQzNFxuMC4wMiAxLjEzODM3ODUgICAwLjc5MTg3NTUgICAwLjcyMjUxNDkgIDAuNjAyMzM4NCAwLjQ1MjEzOTMgMC4zNTkwMzA0IDAuMjM2MjQxNCAwLjE3MjU3Njk4IDAuMTUyMjMzNVxuMC4wNCAwLjkwNDMwMDAgICAwLjYyMTg2ODIgICAwLjU0MTYyOTIgIDAuNDE5MjY4NSAwLjM1NDc0NzUgMC4yNjQ0ODY3IDAuMTkyNzI3NyAwLjEzNzM1MDY0IDAuMTM1NzY2MFxuMC4wOCAwLjcwMjQ5MjYgICAwLjUzNDM2OTggICAwLjQyODA0ODMgIDAuMzIwOTM0NSAwLjI5ODAyMTMgMC4yMDk3OTQ5IDAuMTQ2NjAxNiAwLjEyOTM0MTczIDAuMTEyMjk2MFxuMC4xNiAwLjUzNzU4MTkgICAwLjM1MDI3MjAgICAwLjMwMzQzOTEgIDAuMjU4MTI2NyAwLjE5NzQzODkgMC4xNjYwMjQyIDAuMTI1NjE1NyAwLjA5ODMzMzk4IDAuMTA3NzM0OFxuICAgICAgICAgICAgMi41XG4wICAgIDAuMTE2Mjc5MDdcbjAuMDEgMC4xMzYwNjU3OFxuMC4wMiAwLjEyOTcyNzE4XG4wLjA0IDAuMTMwMTk4MzBcbjAuMDggMC4xMjYzNDM3NFxuMC4xNiAwLjA5MTUwMjg1XG4ifQ== -->
+<pre><code>             0 9.765625E-3 1.953125E-2 3.90625E-2 7.8125E-2   0.15625    0.3125      0.625      1.25
+0    1.0000000   0.9253287   0.9442374  0.9027796 0.7932888 0.5672192 0.3502077 0.19861664 0.1530687
+0.01 1.1157865   0.9319457   0.8599298  0.7177181 0.5957000 0.4300184 0.2444002 0.19000814 0.1481434
+0.02 1.1383785   0.7918755   0.7225149  0.6023384 0.4521393 0.3590304 0.2362414 0.17257698 0.1522335
+0.04 0.9043000   0.6218682   0.5416292  0.4192685 0.3547475 0.2644867 0.1927277 0.13735064 0.1357660
+0.08 0.7024926   0.5343698   0.4280483  0.3209345 0.2980213 0.2097949 0.1466016 0.12934173 0.1122960
+0.16 0.5375819   0.3502720   0.3034391  0.2581267 0.1974389 0.1660242 0.1256157 0.09833398 0.1077348
+            2.5
+0    0.11627907
+0.01 0.13606578
+0.02 0.12972718
+0.04 0.13019830
+0.08 0.12634374
+0.16 0.09150285</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="basic-heatmap-functions" class="section level2">
+<h2>Basic Heatmap Functions</h2>
 <p>Print Heatmap Scaled:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnRfaGVhdG1hcF9ibGlzc19zY2FsZWQoZ3Jvd3RoX2VmZmVjdF9tYXRyaXgsIGV4cG9ydF9uYW1lID0gXCJTYW1wbGVfT3V0cHV0L1NhbXBsZV9PdXRwdXRfU2NhbGVkX0hlYXRtYXAuanBnXCIsIHhsYWJlbCA9IFwiRHJ1ZyBBXCIsIHlsYWJlbCA9IFwiRHJ1ZyBCXCIpXG5gYGAifQ== -->
-<pre class="r"><code>print_heatmap_bliss_scaled(growth_effect_matrix, export_name = &quot;Sample_Output/Sample_Output_Scaled_Heatmap.jpg&quot;, xlabel = &quot;Drug A&quot;, ylabel = &quot;Drug B&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnRfaGVhdG1hcF9ibGlzc19zY2FsZWQoZ3Jvd3RoX2VmZmVjdF9tYXRyaXgsIGV4cG9ydF9uYW1lID0gXCJTYW1wbGVfT3V0cHV0cy9TYW1wbGVfT3V0cHV0L1NhbXBsZV9PdXRwdXRfU2NhbGVkX0hlYXRtYXAuanBnXCIsIHhsYWJlbCA9IFwiRHJ1ZyBBXCIsIHlsYWJlbCA9IFwiRHJ1ZyBCXCIpXG5gYGAifQ== -->
+<pre class="r"><code>print_heatmap_bliss_scaled(growth_effect_matrix, export_name = &quot;Sample_Outputs/Sample_Output/Sample_Output_Scaled_Heatmap.jpg&quot;, xlabel = &quot;Drug A&quot;, ylabel = &quot;Drug B&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoibnVsbCBkZXZpY2UgXG4gICAgICAgICAgMSBcbiJ9 -->
 <pre><code>null device 
@@ -1810,9 +1827,9 @@ print(growth_effect_matrix)</code></pre>
 <p>Print Heatmap Outlier:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnRfaGVhdG1hcF9ibGlzc19vdXRsaWVyX2VsaW0oZ3Jvd3RoX2VmZmVjdF9tYXRyaXgsIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZXhwb3J0X25hbWUgPSBcIlNhbXBsZV9PdXRwdXQvU2FtcGxlX091dHB1dF9PdXRsaWVyX0hlYXRtYXAuanBnXCIsIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgeGxhYmVsID0gXCJEcnVnIEFcIiwgeWxhYmVsID0gXCJEcnVnIEJcIilcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnRfaGVhdG1hcF9ibGlzc19vdXRsaWVyX2VsaW0oZ3Jvd3RoX2VmZmVjdF9tYXRyaXgsIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZXhwb3J0X25hbWUgPSBcIlNhbXBsZV9PdXRwdXRzL1NhbXBsZV9PdXRwdXQvU2FtcGxlX091dHB1dF9PdXRsaWVyX0hlYXRtYXAuanBnXCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB4bGFiZWwgPSBcIkRydWcgQVwiLCB5bGFiZWwgPSBcIkRydWcgQlwiKVxuYGBgIn0= -->
 <pre class="r"><code>print_heatmap_bliss_outlier_elim(growth_effect_matrix, 
-                                 export_name = &quot;Sample_Output/Sample_Output_Outlier_Heatmap.jpg&quot;, 
+                                 export_name = &quot;Sample_Outputs/Sample_Output/Sample_Output_Outlier_Heatmap.jpg&quot;,
                                  xlabel = &quot;Drug A&quot;, ylabel = &quot;Drug B&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoibnVsbCBkZXZpY2UgXG4gICAgICAgICAgMSBcbiJ9 -->
@@ -1821,16 +1838,21 @@ print(growth_effect_matrix)</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Pipeline Print Heatmap: Here we will show how to Analyze all the XLSX files in a single folder using the Pipeline utility. This version analyzes the files sequentially on one CPU</p>
+</div>
+<div id="basic-pipeline-functionality" class="section level2">
+<h2>Basic Pipeline Functionality</h2>
+<p>Here we will show how to Analyze all the XLSX files in a single folder using the Pipeline utility. This version analyzes the files sequentially on one CPU</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX1BpcGVsaW5lX091dHB1dFwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCxcbiAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwgXG4gICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYyhcIk4xMDpYMTZcIikpIFxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX1BpcGVsaW5lX091dHB1dFwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCxcbiAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwgXG4gICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYyhcIk4xMDpYMTZcIiksXG4gICAgICAgICBwYXJhbGxlbF9ydW4gPSBGQUxTRSxcbiAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKSBcbmBgYCJ9 -->
 <pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
-output_directory = toString(paste(getwd(),&quot;/Sample_Pipeline_Output&quot;,sep = &quot;&quot;))
+output_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Pipeline_Output&quot;,sep = &quot;&quot;))
 pipeline(pipelined_print_heatmap_growth_scaled,
          input_directory, 
          output_directory,
-         additional_args = c(&quot;N10:X16&quot;)) </code></pre>
+         additional_args = c(&quot;N10:X16&quot;),
+         parallel_run = FALSE,
+         environment = lsf.str()) </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiTlVMTFxuIn0= -->
 <pre><code>NULL</code></pre>
@@ -1840,9 +1862,9 @@ pipeline(pipelined_print_heatmap_growth_scaled,
 <p>This version runs the same analysis, but in parallel on all available CPU cores. Analyzes one sheet per core.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX1BpcGVsaW5lX091dHB1dFwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCxcbiAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwgXG4gICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYyhcIk4xMDpYMTZcIiksXG4gICAgICAgICBwYXJhbGxlbF9ydW4gPSBUUlVFLFxuICAgICAgICAgZW52aXJvbm1lbnQgPSBsc2Yuc3RyKCkpIFxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX1BpcGVsaW5lX091dHB1dFwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCxcbiAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwgXG4gICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYyhcIk4xMDpYMTZcIiksXG4gICAgICAgICBwYXJhbGxlbF9ydW4gPSBUUlVFLFxuICAgICAgICAgZW52aXJvbm1lbnQgPSBsc2Yuc3RyKCkpIFxuYGBgIn0= -->
 <pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
-output_directory = toString(paste(getwd(),&quot;/Sample_Pipeline_Output&quot;,sep = &quot;&quot;))
+output_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Pipeline_Output&quot;,sep = &quot;&quot;))
 pipeline(pipelined_print_heatmap_growth_scaled,
          input_directory, 
          output_directory,
@@ -1859,6 +1881,9 @@ null device
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="basic-bliss-sum" class="section level2">
+<h2>Basic Bliss Sum</h2>
 <p>Calculate a bliss sum in a couple of different ways:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
@@ -1878,28 +1903,36 @@ print(bliss_sum_scaled)</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="bliss-sum-pipeline" class="section level2">
+<h2>Bliss Sum Pipeline</h2>
 <p>Produce a .csv file with bliss sums for all items inside of a folder. Note, must be done sequentially since all sums point to the same file. Very fast to produce however.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX0JsaXNzX1N1bVwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2JsaXNzX3N1bV9ncm93dGhfc2NhbGVkLFxuICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LCBcbiAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksXG4gICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKFwiTjEwOlgxNlwiLFwiQmxpc3NfU3VtX1NjYWxlZC5jc3ZcIikpIFxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX0JsaXNzX1N1bVwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2JsaXNzX3N1bV9ncm93dGhfc2NhbGVkLFxuICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LCBcbiAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksXG4gICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKFwiTjEwOlgxNlwiLFwiQmxpc3NfU3VtX1NjYWxlZC5jc3ZcIiksXG4gICAgICAgICBwYXJhbGxlbF9ydW4gPSBGQUxTRSxcbiAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKSBcbmBgYCJ9 -->
 <pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
-output_directory = toString(paste(getwd(),&quot;/Sample_Bliss_Sum&quot;,sep = &quot;&quot;))
+output_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Bliss_Sum&quot;,sep = &quot;&quot;))
 pipeline(pipelined_print_bliss_sum_growth_scaled,
          input_directory, 
          output_directory,
-         additional_args = c(&quot;N10:X16&quot;,&quot;Bliss_Sum_Scaled.csv&quot;)) </code></pre>
+         additional_args = c(&quot;N10:X16&quot;,&quot;Bliss_Sum_Scaled.csv&quot;),
+         parallel_run = FALSE,
+         environment = lsf.str()) </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiTlVMTFxuIn0= -->
 <pre><code>NULL</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+</div>
+<div id="recursive-pipeline" class="section level2">
+<h2>Recursive Pipeline</h2>
 <p>Run Analysis on all files of a certain type within a directory. Note that the directory is created dynamically if it doesn’t exit.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX1JlY3Vyc2l2ZV9PdXRwdXRcIixzZXAgPSBcIlwiKSlcbnBpcGVsaW5lX2ZvbGRlcl9yZWN1cnNpdmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKFwiTjEwOlgxNlwiKSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZV90eXBlID0gXCJ4bHN4XCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHBhcmFsbGVsX3J1biA9IFRSVUUsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGNvcmVzID0gOCxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgZW52aXJvbm1lbnQgPSBsc2Yuc3RyKCkpXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX1JlY3Vyc2l2ZV9PdXRwdXRcIixzZXAgPSBcIlwiKSlcbnBpcGVsaW5lX2ZvbGRlcl9yZWN1cnNpdmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKFwiTjEwOlgxNlwiKSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZV90eXBlID0gXCJ4bHN4XCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHBhcmFsbGVsX3J1biA9IFRSVUUsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGNvcmVzID0gOCxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgZW52aXJvbm1lbnQgPSBsc2Yuc3RyKCkpXG5gYGAifQ== -->
 <pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
-output_directory = toString(paste(getwd(),&quot;/Sample_Recursive_Output&quot;,sep = &quot;&quot;))
+output_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Recursive_Output&quot;,sep = &quot;&quot;))
 pipeline_folder_recursive(pipelined_print_heatmap_growth_scaled,
                           input_directory,
                           output_directory,
@@ -1924,7 +1957,7 @@ NULL</code></pre>
 <p>Note, if you would like to put the sample data next to the output, just use the same input and output directory. This is given below:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IGlucHV0X2RpcmVjdG9yeVxucGlwZWxpbmVfZm9sZGVyX3JlY3Vyc2l2ZShwaXBlbGluZWRfcHJpbnRfaGVhdG1hcF9ncm93dGhfc2NhbGVkLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9kaXJlY3RvcnksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9IGMoXCJOMTA6WDE2XCIpLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBmaWxlX3R5cGUgPSBcInhsc3hcIixcbiAgICAgICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA4LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBlbnZpcm9ubWVudCA9IGxzZi5zdHIoKSlcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IGlucHV0X2RpcmVjdG9yeVxucGlwZWxpbmVfZm9sZGVyX3JlY3Vyc2l2ZShwaXBlbGluZWRfcHJpbnRfaGVhdG1hcF9ncm93dGhfc2NhbGVkLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9kaXJlY3RvcnksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9IGMoXCJOMTA6WDE2XCIpLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBmaWxlX3R5cGUgPSBcInhsc3hcIixcbiAgICAgICAgICAgICAgICAgICAgICAgICAgcGFyYWxsZWxfcnVuID0gVFJVRSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA4LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBlbnZpcm9ubWVudCA9IGxzZi5zdHIoKSlcbmBgYCJ9 -->
 <pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
 output_directory = input_directory
 pipeline_folder_recursive(pipelined_print_heatmap_growth_scaled,
@@ -1932,39 +1965,229 @@ pipeline_folder_recursive(pipelined_print_heatmap_growth_scaled,
                           output_directory,
                           additional_args = c(&quot;N10:X16&quot;),
                           file_type = &quot;xlsx&quot;,
+                          parallel_run = TRUE,
                           cores = 8,
                           environment = lsf.str())</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUnVubmluZyB0YXNrIG9uIDggY29yZXNcbk5VTExcblJ1bm5pbmcgdGFzayBvbiA4IGNvcmVzXG5OVUxMXG5SdW5uaW5nIHRhc2sgb24gOCBjb3Jlc1xuTlVMTFxuUnVubmluZyB0YXNrIG9uIDggY29yZXNcbk5VTExcbiJ9 -->
+<pre><code>Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Run all analysis and place the files into a main folder that contains all the nested files. Can run in parallel or sequentially. Note only the analysis in individual folders is run in parallel</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX1JlY3Vyc2l2ZV9Db21iaW5lZFwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmVfZm9sZGVyX2NvbWJpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX291dGxpZXJfZWxpbSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKFwiTjEwOlgxNlwiKSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZV90eXBlID0gXCJ4bHN4XCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHBhcmFsbGVsX3J1biA9IEZBTFNFLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBjb3JlcyA9IDgsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX1JlY3Vyc2l2ZV9Db21iaW5lZFwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmVfZm9sZGVyX2NvbWJpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX291dGxpZXJfZWxpbSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKFwiTjEwOlgxNlwiKSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZV90eXBlID0gXCJ4bHN4XCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHBhcmFsbGVsX3J1biA9IFRSVUUsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGNvcmVzID0gOCxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgZW52aXJvbm1lbnQgPSBsc2Yuc3RyKCkpXG5gYGAifQ== -->
 <pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
-output_directory = toString(paste(getwd(),&quot;/Sample_Recursive_Combined&quot;,sep = &quot;&quot;))
+output_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Recursive_Combined&quot;,sep = &quot;&quot;))
 pipeline_folder_combine(pipelined_print_heatmap_growth_outlier_elim,
                           input_directory,
                           output_directory,
                           additional_args = c(&quot;N10:X16&quot;),
                           file_type = &quot;xlsx&quot;,
+                          parallel_run = TRUE,
+                          cores = 8,
+                          environment = lsf.str())</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUnVubmluZyB0YXNrIG9uIDggY29yZXNcbk5VTExcblJ1bm5pbmcgdGFzayBvbiA4IGNvcmVzXG5OVUxMXG5SdW5uaW5nIHRhc2sgb24gOCBjb3Jlc1xuTlVMTFxuUnVubmluZyB0YXNrIG9uIDggY29yZXNcbk5VTExcbiJ9 -->
+<pre><code>Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+</div>
+<div id="synergy-functions-using-bioc" class="section level1">
+<h1>Synergy Functions using BioC</h1>
+<p>Thanks Clint for making this part!</p>
+<div id="import-the-data-as-a-synergy-data-frame" class="section level2">
+<h2>Import the Data as a Synergy Data Frame</h2>
+<p>input_file should be an xlsx file and the range defines where the growth data is at.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZmlsZSA9IFwiU2FtcGxlX0RhdGEvU2FtcGxlX0V4Y2VsX1RlbXBsYXRlLnhsc3hcIlxuZGF0YV9mcmFtZXMgPC0gYnVpbGRfZGF0YV9mcmFtZShpbnB1dF9maWxlLCByYW5nZT1cIk4xMDpYMTZcIiwgVmlhYmlsaXR5X0RhdGEgPSBUUlVFLCBcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTm9ybWFsaXplID0gVFJVRSwgRHJ1Z19BID0gXCJEb2NldGF4ZWxcIiwgRHJ1Z19CID0gXCJMdW1pbmVzcGliXCIsXG4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIENlbGxfTGluZSA9IFwiTWlhLVBhQ2EtMlwiLCBDb25jX0EgPSBcInVNXCIsIENvbmNfQiA9IFwidU1cIiwgcmVwbGljYXRlID0gMSlcbmBgYCJ9 -->
+<pre class="r"><code>input_file = &quot;Sample_Data/Sample_Excel_Template.xlsx&quot;
+data_frames &lt;- build_data_frame(input_file, range=&quot;N10:X16&quot;, Viability_Data = TRUE, 
+                                Normalize = TRUE, Drug_A = &quot;Docetaxel&quot;, Drug_B = &quot;Luminespib&quot;,
+                                Cell_Line = &quot;Mia-PaCa-2&quot;, Conc_A = &quot;uM&quot;, Conc_B = &quot;uM&quot;, replicate = 1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="print-logistic-curves-and-inflection-points" class="section level2">
+<h2>Print Logistic Curves and Inflection Points</h2>
+<p>Note if Filename is left NULL it uses the name built into the data_frame above.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnRfbG9naXN0aWNfZnVuY3Rpb24oZGF0YV9mcmFtZXMsIFxuICAgICAgICAgICAgICAgICAgICAgICAgTG9naXN0aWNfT3V0cHV0X0ZvbGRlciA9IFwiU2FtcGxlX091dHB1dHMvU2FtcGxlX0xvZ2lzdGljX0N1cnZlc1wiLFxuICAgICAgICAgICAgICAgICAgICAgICAgbnVtX3BhcmFtX2xvZ2lzdGljID0gXCJhbGxcIiwgZmlsZW5hbWUgPSBOVUxMKVxuYGBgIn0= -->
+<pre class="r"><code>print_logistic_function(data_frames, 
+                        Logistic_Output_Folder = &quot;Sample_Outputs/Sample_Logistic_Curves&quot;,
+                        num_param_logistic = &quot;all&quot;, filename = NULL)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTkEvSW5mIHJlcGxhY2VkIGJ5IG1heGltdW0gcG9zaXRpdmUgdmFsdWVOQS9JbmYgcmVwbGFjZWQgYnkgbWF4aW11bSBwb3NpdGl2ZSB2YWx1ZU5BL0luZiByZXBsYWNlZCBieSBtYXhpbXVtIHBvc2l0aXZlIHZhbHVlTkEvSW5mIHJlcGxhY2VkIGJ5IG1heGltdW0gcG9zaXRpdmUgdmFsdWVcbiJ9 -->
+<pre><code>NA/Inf replaced by maximum positive valueNA/Inf replaced by maximum positive valueNA/Inf replaced by maximum positive valueNA/Inf replaced by maximum positive value</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoibnVsbCBkZXZpY2UgXG4gICAgICAgICAgMSBcbiJ9 -->
+<pre><code>null device 
+          1 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Note if Filename is left NULL it uses the name built into the data_frame above.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnRfbG9naXN0aWNfaW5mbGVjdGlvbl9wb2ludHMoZGF0YV9mcmFtZXMsIFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSW5mbGVjdGlvbl9PdXRwdXRfRm9sZGVyID0gXCJTYW1wbGVfT3V0cHV0cy9TYW1wbGVfSW5mbGVjdGlvbl9Qb2ludHNcIixcbiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIG51bV9wYXJhbV9sb2dpc3RpYyA9IFwiYWxsXCIsIGZpbGVuYW1lID0gTlVMTClcbmBgYCJ9 -->
+<pre class="r"><code>print_logistic_inflection_points(data_frames, 
+                                 Inflection_Output_Folder = &quot;Sample_Outputs/Sample_Inflection_Points&quot;,
+                                 num_param_logistic = &quot;all&quot;, filename = NULL)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTkEvSW5mIHJlcGxhY2VkIGJ5IG1heGltdW0gcG9zaXRpdmUgdmFsdWVOQS9JbmYgcmVwbGFjZWQgYnkgbWF4aW11bSBwb3NpdGl2ZSB2YWx1ZU5BL0luZiByZXBsYWNlZCBieSBtYXhpbXVtIHBvc2l0aXZlIHZhbHVlTkEvSW5mIHJlcGxhY2VkIGJ5IG1heGltdW0gcG9zaXRpdmUgdmFsdWVcbiJ9 -->
+<pre><code>NA/Inf replaced by maximum positive valueNA/Inf replaced by maximum positive valueNA/Inf replaced by maximum positive valueNA/Inf replaced by maximum positive value</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoibnVsbCBkZXZpY2UgXG4gICAgICAgICAgMSBcbiJ9 -->
+<pre><code>null device 
+          1 </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="print-a-synergy-map" class="section level2">
+<h2>Print a Synergy Map</h2>
+<p>synergy_type can be: “HSA”, “Loewe”, “Bliss”, or “ZIP” synergy method <em>ZIP combines the assumptions of both Loewe and Bliss models</em></p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3luZXJneV9hbmFseXNpcyhkYXRhX2ZyYW1lcywgc3luZXJneV90eXBlID0gXCJCbGlzc1wiLCBPdXRwdXRfRm9sZGVyID0gXCJTYW1wbGVfT3V0cHV0cy9TYW1wbGVfU3luZXJneVwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZW5hbWUgPSBOVUxMKVxuYGBgIn0= -->
+<pre class="r"><code>synergy_analysis(data_frames, synergy_type = &quot;Bliss&quot;, Output_Folder = &quot;Sample_Outputs/Sample_Synergy&quot;,
+                           filename = NULL)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-plot-begin eyJjb25kaXRpb25zIjpbXSwiaGVpZ2h0Ijo0MzIuNjMyOSwic2l6ZV9iZWhhdmlvciI6MCwid2lkdGgiOjcwMH0= -->
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArwAAAGwCAMAAAB8TkaXAAAAA1BMVEX///+nxBvIAAAACXBIWXMAAA7DAAAOwwHHb6hkAAABPElEQVR4nO3BAQ0AAADCoPdPbQ8HFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwafLAABhydcUAAAAABJRU5ErkJggg==" /></p>
+<!-- rnb-plot-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="pipeline-synergy-functions" class="section level2">
+<h2>Pipeline Synergy Functions</h2>
+<p>Logistic Pipeline:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX0xvZ2lzdGljX0NvbWJpbmVcIixzZXAgPSBcIlwiKSlcbnBpcGVsaW5lX2ZvbGRlcl9jb21iaW5lKHBpcGVsaW5lZF9Mb2dpc3RpY19DdXJ2ZXMsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGlucHV0X2RpcmVjdG9yeSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgb3V0cHV0X2RpcmVjdG9yeSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYyhcIk4xMDpYMTZcIiwgVFJVRSwgVFJVRSwgXCJhbGxcIiksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVfdHlwZSA9IFwieGxzeFwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBwYXJhbGxlbF9ydW4gPSBUUlVFLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBjb3JlcyA9IDgsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKVxuYGBgIn0= -->
+<pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
+output_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Logistic_Combine&quot;,sep = &quot;&quot;))
+pipeline_folder_combine(pipelined_Logistic_Curves,
+                          input_directory,
+                          output_directory,
+                          additional_args = c(&quot;N10:X16&quot;, TRUE, TRUE, &quot;all&quot;),
+                          file_type = &quot;xlsx&quot;,
+                          parallel_run = TRUE,
+                          cores = 8,
+                          environment = lsf.str())</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUnVubmluZyB0YXNrIG9uIDggY29yZXNcbk5VTExcblJ1bm5pbmcgdGFzayBvbiA4IGNvcmVzXG5OVUxMXG5SdW5uaW5nIHRhc2sgb24gOCBjb3Jlc1xuTlVMTFxuUnVubmluZyB0YXNrIG9uIDggY29yZXNcbk5VTExcbiJ9 -->
+<pre><code>Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Inflection Pipeline:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX0luZmxlY3Rpb25fQ29tYmluZVwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmVfZm9sZGVyX2NvbWJpbmUocGlwZWxpbmVkX0luZmxlY3Rpb25fQ3VydmVzLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9kaXJlY3RvcnksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9IGMoXCJOMTA6WDE2XCIsIFRSVUUsIFRSVUUsIFwiYWxsXCIpLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBmaWxlX3R5cGUgPSBcInhsc3hcIixcbiAgICAgICAgICAgICAgICAgICAgICAgICAgcGFyYWxsZWxfcnVuID0gVFJVRSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA4LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBlbnZpcm9ubWVudCA9IGxzZi5zdHIoKSlcbmBgYCJ9 -->
+<pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
+output_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Inflection_Combine&quot;,sep = &quot;&quot;))
+pipeline_folder_combine(pipelined_Inflection_Curves,
+                          input_directory,
+                          output_directory,
+                          additional_args = c(&quot;N10:X16&quot;, TRUE, TRUE, &quot;all&quot;),
+                          file_type = &quot;xlsx&quot;,
+                          parallel_run = TRUE,
+                          cores = 8,
+                          environment = lsf.str())</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUnVubmluZyB0YXNrIG9uIDggY29yZXNcbk5VTExcblJ1bm5pbmcgdGFzayBvbiA4IGNvcmVzXG5OVUxMXG5SdW5uaW5nIHRhc2sgb24gOCBjb3Jlc1xuTlVMTFxuUnVubmluZyB0YXNrIG9uIDggY29yZXNcbk5VTExcbiJ9 -->
+<pre><code>Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL
+Running task on 8 cores
+NULL</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Graph Pipeline:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfRGF0YVwiLHNlcCA9IFwiXCIpKVxub3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksXCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX1N5bmVyZ3lfQ29tYmluZVwiLHNlcCA9IFwiXCIpKVxucGlwZWxpbmVfZm9sZGVyX2NvbWJpbmUocGlwZWxpbmVkX1N5bmVyZ3lfR3JhcGhzLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9kaXJlY3RvcnksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9IGMoXCJOMTA6WDE2XCIsIFwiQmxpc3NcIiwgVFJVRSwgVFJVRSksXG4gICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVfdHlwZSA9IFwieGxzeFwiLFxuICAgICAgICAgICAgICAgICAgICAgICAgICBwYXJhbGxlbF9ydW4gPSBGQUxTRSxcbiAgICAgICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA4LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBlbnZpcm9ubWVudCA9IGxzZi5zdHIoKSlcbmBgYCJ9 -->
+<pre class="r"><code>input_directory = toString(paste(getwd(),&quot;/Sample_Data&quot;,sep = &quot;&quot;))
+output_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Synergy_Combine&quot;,sep = &quot;&quot;))
+pipeline_folder_combine(pipelined_Synergy_Graphs,
+                          input_directory,
+                          output_directory,
+                          additional_args = c(&quot;N10:X16&quot;, &quot;Bliss&quot;, TRUE, TRUE),
+                          file_type = &quot;xlsx&quot;,
                           parallel_run = FALSE,
                           cores = 8,
                           environment = lsf.str())</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiU2FtcGxlX0V4Y2VsX1RlbXBsYXRlXCJcblsxXSBcIlNhbXBsZV9FeGNlbF9UZW1wbGF0ZS5qcGdcIlxuWzFdIFwiTmVzdGVkX2ZvbGRlci1TYW1wbGVfRXhjZWxfVGVtcGxhdGVcIlxuWzFdIFwiTmVzdGVkX2ZvbGRlci1TYW1wbGVfRXhjZWxfVGVtcGxhdGUuanBnXCJcblsxXSBcIk5lc3RlZF9mb2xkZXItTmVzdF9BLVNhbXBsZV9FeGNlbF9UZW1wbGF0ZVwiXG5bMV0gXCJOZXN0ZWRfZm9sZGVyLU5lc3RfQS1TYW1wbGVfRXhjZWxfVGVtcGxhdGUuanBnXCJcblsxXSBcIk5lc3RlZF9mb2xkZXItTmVzdF9CLVNhbXBsZV9FeGNlbF9UZW1wbGF0ZVwiXG5bMV0gXCJOZXN0ZWRfZm9sZGVyLU5lc3RfQi1TYW1wbGVfRXhjZWxfVGVtcGxhdGUuanBnXCJcbiJ9 -->
-<pre><code>[1] &quot;Sample_Excel_Template&quot;
-[1] &quot;Sample_Excel_Template.jpg&quot;
-[1] &quot;Nested_folder-Sample_Excel_Template&quot;
-[1] &quot;Nested_folder-Sample_Excel_Template.jpg&quot;
-[1] &quot;Nested_folder-Nest_A-Sample_Excel_Template&quot;
-[1] &quot;Nested_folder-Nest_A-Sample_Excel_Template.jpg&quot;
-[1] &quot;Nested_folder-Nest_B-Sample_Excel_Template&quot;
-[1] &quot;Nested_folder-Nest_B-Sample_Excel_Template.jpg&quot;</code></pre>
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="combine-synergy-files" class="section level2">
+<h2>Combine Synergy Files</h2>
+<p>Here we combine the files in the synergy folder into one dataframe. Works specifically for a directory full of CSV files that were produced in the above.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiU2NyaXB0cy9EcnVnX0xvZ2lzdGljX1BhY2thZ2UuUlwiKVxuSW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfT3V0cHV0cy9TYW1wbGVfU3luZXJneV9Db21iaW5lXCIsc2VwID0gXCJcIikpXG5jb21iaW5lZF9mcmFtZSA9IENvbWJpbmVfU3luZXJneV9GaWxlcyhJbnB1dF9kaXJlY3RvcnkpXG5gYGAifQ== -->
+<pre class="r"><code>source(&quot;Scripts/Drug_Logistic_Package.R&quot;)
+Input_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Synergy_Combine&quot;,sep = &quot;&quot;))
+combined_frame = Combine_Synergy_Files(Input_directory)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Here we can combine the files and reprint a CSV of the combined files. if remove_csv is true, then destroy the file after reading it.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc291cmNlKFwiU2NyaXB0cy9EcnVnX0xvZ2lzdGljX1BhY2thZ2UuUlwiKVxuSW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfT3V0cHV0cy9TYW1wbGVfU3luZXJneV9Db21iaW5lXCIsc2VwID0gXCJcIikpXG5PdXRwdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSxcIi9TYW1wbGVfT3V0cHV0cy9TYW1wbGVfU3luZXJneV9Db21iaW5lL0NvbWJpbmVkX1N5bmVyZ3lcIixzZXAgPSBcIlwiKSlcbkNvbWJpbmVfU3luZXJneV9GaWxlc19DU1YoSW5wdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBPdXRwdXRfZGlyZWN0b3J5LFxuICAgICAgICAgICAgICAgICAgICAgICAgICBPdXRwdXRfRmlsZW5hbWUgPSBcIkNvbWJpbmVkX1N5bmVyZ3lcIixcbiAgICAgICAgICAgICAgICAgICAgICAgICAgYWxsb3dfb3ZlcndyaXRlID0gRkFMU0UsXG4gICAgICAgICAgICAgICAgICAgICAgICAgIHJlbW92ZV9jc3YgPSBUUlVFKVxuYGBgIn0= -->
+<pre class="r"><code>source(&quot;Scripts/Drug_Logistic_Package.R&quot;)
+Input_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Synergy_Combine&quot;,sep = &quot;&quot;))
+Output_directory = toString(paste(getwd(),&quot;/Sample_Outputs/Sample_Synergy_Combine/Combined_Synergy&quot;,sep = &quot;&quot;))
+Combine_Synergy_Files_CSV(Input_directory,
+                          Output_directory,
+                          Output_Filename = &quot;Combined_Synergy&quot;,
+                          allow_overwrite = FALSE,
+                          remove_csv = TRUE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwiRmlsZSBBbHJlYWR5IEV4aXN0cy4gUGxlYXNlIFVzZSBhIGRpZmZlcmVudCBGaWxlIE5hbWVcIlxuIn0= -->
+<pre><code>[1] &quot;File Already Exists. Please Use a different File Name&quot;</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+</div>
+</div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRTUlQgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpSIE5vdGVib29rIGZvciBkaXNwbGF5aW5nIHRoZSBEU1JUIFNjcmVlbiBkYXRhIGFuZCByZWxldmFudCBhbmFseXNpcy4gDQoNCkltcG9ydCB0aGUgbmVjY2VzYXJ5IGZ1bmN0aW9uczoNCmBgYHtyfQ0Kc291cmNlKCJVdGlsaXRpZXMvVXRpbGl0eV9wYWNrYWdlLlIiKQ0Kc291cmNlKCJTY3JpcHRzL0RydWdfU3luZXJneV9QYWNrYWdlLlIiKQ0KYGBgDQoNCg0KSW1wb3J0IHRoZSBkYXRhOg0KDQpgYGB7cn0NCmdyb3d0aF9lZmZlY3RfbWF0cml4ID0gaW1wb3J0X3BsYXRlX3JhbmdlKCJTYW1wbGVfRGF0YS9TYW1wbGVfRXhjZWxfVGVtcGxhdGUueGxzeCIsICJOMTA6WDE2IikNCnByaW50KGdyb3d0aF9lZmZlY3RfbWF0cml4KQ0KYGBgDQoNCg0KUHJpbnQgSGVhdG1hcCBTY2FsZWQ6DQpgYGB7cn0NCnByaW50X2hlYXRtYXBfYmxpc3Nfc2NhbGVkKGdyb3d0aF9lZmZlY3RfbWF0cml4LCBleHBvcnRfbmFtZSA9ICJTYW1wbGVfT3V0cHV0L1NhbXBsZV9PdXRwdXRfU2NhbGVkX0hlYXRtYXAuanBnIiwgeGxhYmVsID0gIkRydWcgQSIsIHlsYWJlbCA9ICJEcnVnIEIiKQ0KYGBgDQoNClByaW50IEhlYXRtYXAgT3V0bGllcjoNCmBgYHtyfQ0KcHJpbnRfaGVhdG1hcF9ibGlzc19vdXRsaWVyX2VsaW0oZ3Jvd3RoX2VmZmVjdF9tYXRyaXgsIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZXhwb3J0X25hbWUgPSAiU2FtcGxlX091dHB1dC9TYW1wbGVfT3V0cHV0X091dGxpZXJfSGVhdG1hcC5qcGciLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHhsYWJlbCA9ICJEcnVnIEEiLCB5bGFiZWwgPSAiRHJ1ZyBCIikNCmBgYA0KDQpQaXBlbGluZSBQcmludCBIZWF0bWFwOg0KSGVyZSB3ZSB3aWxsIHNob3cgaG93IHRvIEFuYWx5emUgYWxsIHRoZSBYTFNYIGZpbGVzIGluIGEgc2luZ2xlIGZvbGRlciB1c2luZyB0aGUgUGlwZWxpbmUgdXRpbGl0eS4NClRoaXMgdmVyc2lvbiBhbmFseXplcyB0aGUgZmlsZXMgc2VxdWVudGlhbGx5IG9uIG9uZSBDUFUNCg0KYGBge3J9DQppbnB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX0RhdGEiLHNlcCA9ICIiKSkNCm91dHB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX1BpcGVsaW5lX091dHB1dCIsc2VwID0gIiIpKQ0KcGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCwNCiAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwgDQogICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LA0KICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYygiTjEwOlgxNiIpKSANCmBgYA0KDQpUaGlzIHZlcnNpb24gcnVucyB0aGUgc2FtZSBhbmFseXNpcywgYnV0IGluIHBhcmFsbGVsIG9uIGFsbCBhdmFpbGFibGUgQ1BVIGNvcmVzLiBBbmFseXplcyBvbmUgc2hlZXQgcGVyIGNvcmUuIA0KYGBge3J9DQppbnB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX0RhdGEiLHNlcCA9ICIiKSkNCm91dHB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX1BpcGVsaW5lX091dHB1dCIsc2VwID0gIiIpKQ0KcGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCwNCiAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwgDQogICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LA0KICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYygiTjEwOlgxNiIpLA0KICAgICAgICAgcGFyYWxsZWxfcnVuID0gVFJVRSwNCiAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKSANCmBgYA0KDQpDYWxjdWxhdGUgYSBibGlzcyBzdW0gaW4gYSBjb3VwbGUgb2YgZGlmZmVyZW50IHdheXM6DQpgYGB7cn0NCmJsaXNzX3N1bV9zY2FsZWQgPSBjYWxjdWxhdGVfYmxpc3Nfc3VtX3NjYWxlZChncm93dGhfZWZmZWN0X21hdHJpeCkNCmJsaXNzX3N1bV9vdXRsaWVyID0gY2FsY3VsYXRlX2JsaXNzX3N1bV9vdXRsaWVyX2VsaW0oZ3Jvd3RoX2VmZmVjdF9tYXRyaXgpDQpwcmludChibGlzc19zdW1fc2NhbGVkKQ0KcHJpbnQoYmxpc3Nfc3VtX291dGxpZXIpDQpgYGANCg0KUHJvZHVjZSBhIC5jc3YgZmlsZSB3aXRoIGJsaXNzIHN1bXMgZm9yIGFsbCBpdGVtcyBpbnNpZGUgb2YgYSBmb2xkZXIuIE5vdGUsIG11c3QgYmUgZG9uZSBzZXF1ZW50aWFsbHkgc2luY2UgYWxsIHN1bXMgcG9pbnQgdG8gdGhlIHNhbWUgZmlsZS4NClZlcnkgZmFzdCB0byBwcm9kdWNlIGhvd2V2ZXIuIA0KYGBge3J9DQppbnB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX0RhdGEiLHNlcCA9ICIiKSkNCm91dHB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX0JsaXNzX1N1bSIsc2VwID0gIiIpKQ0KcGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2JsaXNzX3N1bV9ncm93dGhfc2NhbGVkLA0KICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LCANCiAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksDQogICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKCJOMTA6WDE2IiwiQmxpc3NfU3VtX1NjYWxlZC5jc3YiKSkgDQpgYGANCg0KDQpSdW4gQW5hbHlzaXMgb24gYWxsIGZpbGVzIG9mIGEgY2VydGFpbiB0eXBlIHdpdGhpbiBhIGRpcmVjdG9yeS4gTm90ZSB0aGF0IHRoZSBkaXJlY3RvcnkgaXMgY3JlYXRlZCBkeW5hbWljYWxseSBpZiBpdCBkb2Vzbid0IGV4aXQuIA0KYGBge3J9DQppbnB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX0RhdGEiLHNlcCA9ICIiKSkNCm91dHB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX1JlY3Vyc2l2ZV9PdXRwdXQiLHNlcCA9ICIiKSkNCnBpcGVsaW5lX2ZvbGRlcl9yZWN1cnNpdmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKCJOMTA6WDE2IiksDQogICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVfdHlwZSA9ICJ4bHN4IiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgcGFyYWxsZWxfcnVuID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA4LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBlbnZpcm9ubWVudCA9IGxzZi5zdHIoKSkNCmBgYA0KDQpOb3RlLCBpZiB5b3Ugd291bGQgbGlrZSB0byBwdXQgdGhlIHNhbXBsZSBkYXRhIG5leHQgdG8gdGhlIG91dHB1dCwganVzdCB1c2UgdGhlIHNhbWUgaW5wdXQgYW5kIG91dHB1dCBkaXJlY3RvcnkuIFRoaXMgaXMgZ2l2ZW4gYmVsb3c6DQpgYGB7cn0NCmlucHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksIi9TYW1wbGVfRGF0YSIsc2VwID0gIiIpKQ0Kb3V0cHV0X2RpcmVjdG9yeSA9IGlucHV0X2RpcmVjdG9yeQ0KcGlwZWxpbmVfZm9sZGVyX3JlY3Vyc2l2ZShwaXBlbGluZWRfcHJpbnRfaGVhdG1hcF9ncm93dGhfc2NhbGVkLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9kaXJlY3RvcnksDQogICAgICAgICAgICAgICAgICAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksDQogICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9IGMoIk4xMDpYMTYiKSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZV90eXBlID0gInhsc3giLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBwYXJhbGxlbF9ydW4gPSBUUlVFLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBjb3JlcyA9IDgsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKQ0KYGBgDQoNClJ1biBhbGwgYW5hbHlzaXMgYW5kIHBsYWNlIHRoZSBmaWxlcyBpbnRvIGEgbWFpbiBmb2xkZXIgdGhhdCBjb250YWlucyBhbGwgdGhlIG5lc3RlZCBmaWxlcy4NCkNhbiBydW4gaW4gcGFyYWxsZWwgb3Igc2VxdWVudGlhbGx5LiBOb3RlIG9ubHkgdGhlIGFuYWx5c2lzIGluIGluZGl2aWR1YWwgZm9sZGVycyBpcyBydW4gaW4gcGFyYWxsZWwNCmBgYHtyfQ0KaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9EYXRhIixzZXAgPSAiIikpDQpvdXRwdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9SZWN1cnNpdmVfQ29tYmluZWQiLHNlcCA9ICIiKSkNCnBpcGVsaW5lX2ZvbGRlcl9jb21iaW5lKHBpcGVsaW5lZF9wcmludF9oZWF0bWFwX2dyb3d0aF9vdXRsaWVyX2VsaW0sDQogICAgICAgICAgICAgICAgICAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgb3V0cHV0X2RpcmVjdG9yeSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYygiTjEwOlgxNiIpLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBmaWxlX3R5cGUgPSAieGxzeCIsDQogICAgICAgICAgICAgICAgICAgICAgICAgIHBhcmFsbGVsX3J1biA9IEZBTFNFLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBjb3JlcyA9IDgsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKQ0KYGBgDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRTUlQgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQojIFIgTm90ZWJvb2sgZm9yIEFuYWx5emluZyBTeW5lcmd5DQpSIE5vdGVib29rIGZvciBkaXNwbGF5aW5nIHRoZSBEU1JUIFNjcmVlbiBkYXRhIGFuZCByZWxldmFudCBhbmFseXNpcy4gDQoNCg0KIyMgU2V0dXAgRW52aXJvbm1lbnQNCkltcG9ydCB0aGUgbmVjY2VzYXJ5IGZ1bmN0aW9uczoNCmBgYHtyfQ0Kc291cmNlKCJVdGlsaXRpZXMvVXRpbGl0eV9wYWNrYWdlLlIiKQ0Kc291cmNlKCJTY3JpcHRzL0RydWdfU3luZXJneV9QYWNrYWdlLlIiKQ0Kc291cmNlKCJTY3JpcHRzL0RydWdfTG9naXN0aWNfUGFja2FnZS5SIikNCmBgYA0KDQoNCiMjIEltcG9ydCBEYXRhDQoNCmBgYHtyfQ0KZ3Jvd3RoX2VmZmVjdF9tYXRyaXggPSBpbXBvcnRfcGxhdGVfcmFuZ2UoIlNhbXBsZV9EYXRhL1NhbXBsZV9FeGNlbF9UZW1wbGF0ZS54bHN4IiwgIk4xMDpYMTYiKQ0KcHJpbnQoZ3Jvd3RoX2VmZmVjdF9tYXRyaXgpDQpgYGANCg0KDQojIyBCYXNpYyBIZWF0bWFwIEZ1bmN0aW9ucw0KDQpQcmludCBIZWF0bWFwIFNjYWxlZDoNCmBgYHtyfQ0KcHJpbnRfaGVhdG1hcF9ibGlzc19zY2FsZWQoZ3Jvd3RoX2VmZmVjdF9tYXRyaXgsIGV4cG9ydF9uYW1lID0gIlNhbXBsZV9PdXRwdXRzL1NhbXBsZV9PdXRwdXQvU2FtcGxlX091dHB1dF9TY2FsZWRfSGVhdG1hcC5qcGciLCB4bGFiZWwgPSAiRHJ1ZyBBIiwgeWxhYmVsID0gIkRydWcgQiIpDQpgYGANCg0KUHJpbnQgSGVhdG1hcCBPdXRsaWVyOg0KYGBge3J9DQpwcmludF9oZWF0bWFwX2JsaXNzX291dGxpZXJfZWxpbShncm93dGhfZWZmZWN0X21hdHJpeCwgDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBleHBvcnRfbmFtZSA9ICJTYW1wbGVfT3V0cHV0cy9TYW1wbGVfT3V0cHV0L1NhbXBsZV9PdXRwdXRfT3V0bGllcl9IZWF0bWFwLmpwZyIsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB4bGFiZWwgPSAiRHJ1ZyBBIiwgeWxhYmVsID0gIkRydWcgQiIpDQpgYGANCg0KIyMgQmFzaWMgUGlwZWxpbmUgRnVuY3Rpb25hbGl0eQ0KDQpIZXJlIHdlIHdpbGwgc2hvdyBob3cgdG8gQW5hbHl6ZSBhbGwgdGhlIFhMU1ggZmlsZXMgaW4gYSBzaW5nbGUgZm9sZGVyIHVzaW5nIHRoZSBQaXBlbGluZSB1dGlsaXR5Lg0KVGhpcyB2ZXJzaW9uIGFuYWx5emVzIHRoZSBmaWxlcyBzZXF1ZW50aWFsbHkgb24gb25lIENQVQ0KDQpgYGB7cn0NCmlucHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksIi9TYW1wbGVfRGF0YSIsc2VwID0gIiIpKQ0Kb3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksIi9TYW1wbGVfT3V0cHV0cy9TYW1wbGVfUGlwZWxpbmVfT3V0cHV0IixzZXAgPSAiIikpDQpwaXBlbGluZShwaXBlbGluZWRfcHJpbnRfaGVhdG1hcF9ncm93dGhfc2NhbGVkLA0KICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LCANCiAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksDQogICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKCJOMTA6WDE2IiksDQogICAgICAgICBwYXJhbGxlbF9ydW4gPSBGQUxTRSwNCiAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKSANCmBgYA0KDQpUaGlzIHZlcnNpb24gcnVucyB0aGUgc2FtZSBhbmFseXNpcywgYnV0IGluIHBhcmFsbGVsIG9uIGFsbCBhdmFpbGFibGUgQ1BVIGNvcmVzLiBBbmFseXplcyBvbmUgc2hlZXQgcGVyIGNvcmUuIA0KYGBge3J9DQppbnB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX0RhdGEiLHNlcCA9ICIiKSkNCm91dHB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX1BpcGVsaW5lX091dHB1dCIsc2VwID0gIiIpKQ0KcGlwZWxpbmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCwNCiAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwgDQogICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LA0KICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYygiTjEwOlgxNiIpLA0KICAgICAgICAgcGFyYWxsZWxfcnVuID0gVFJVRSwNCiAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKSANCmBgYA0KDQojIyBCYXNpYyBCbGlzcyBTdW0NCg0KQ2FsY3VsYXRlIGEgYmxpc3Mgc3VtIGluIGEgY291cGxlIG9mIGRpZmZlcmVudCB3YXlzOg0KYGBge3J9DQpibGlzc19zdW1fc2NhbGVkID0gY2FsY3VsYXRlX2JsaXNzX3N1bV9zY2FsZWQoZ3Jvd3RoX2VmZmVjdF9tYXRyaXgpDQpibGlzc19zdW1fb3V0bGllciA9IGNhbGN1bGF0ZV9ibGlzc19zdW1fb3V0bGllcl9lbGltKGdyb3d0aF9lZmZlY3RfbWF0cml4KQ0KcHJpbnQoYmxpc3Nfc3VtX3NjYWxlZCkNCnByaW50KGJsaXNzX3N1bV9vdXRsaWVyKQ0KYGBgDQoNCiMjIEJsaXNzIFN1bSBQaXBlbGluZQ0KDQpQcm9kdWNlIGEgLmNzdiBmaWxlIHdpdGggYmxpc3Mgc3VtcyBmb3IgYWxsIGl0ZW1zIGluc2lkZSBvZiBhIGZvbGRlci4gTm90ZSwgbXVzdCBiZSBkb25lIHNlcXVlbnRpYWxseSBzaW5jZSBhbGwgc3VtcyBwb2ludCB0byB0aGUgc2FtZSBmaWxlLg0KVmVyeSBmYXN0IHRvIHByb2R1Y2UgaG93ZXZlci4gDQpgYGB7cn0NCmlucHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksIi9TYW1wbGVfRGF0YSIsc2VwID0gIiIpKQ0Kb3V0cHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksIi9TYW1wbGVfT3V0cHV0cy9TYW1wbGVfQmxpc3NfU3VtIixzZXAgPSAiIikpDQpwaXBlbGluZShwaXBlbGluZWRfcHJpbnRfYmxpc3Nfc3VtX2dyb3d0aF9zY2FsZWQsDQogICAgICAgICBpbnB1dF9kaXJlY3RvcnksIA0KICAgICAgICAgb3V0cHV0X2RpcmVjdG9yeSwNCiAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9IGMoIk4xMDpYMTYiLCJCbGlzc19TdW1fU2NhbGVkLmNzdiIpLA0KICAgICAgICAgcGFyYWxsZWxfcnVuID0gRkFMU0UsDQogICAgICAgICBlbnZpcm9ubWVudCA9IGxzZi5zdHIoKSkgDQpgYGANCg0KIyMgUmVjdXJzaXZlIFBpcGVsaW5lIA0KDQpSdW4gQW5hbHlzaXMgb24gYWxsIGZpbGVzIG9mIGEgY2VydGFpbiB0eXBlIHdpdGhpbiBhIGRpcmVjdG9yeS4gTm90ZSB0aGF0IHRoZSBkaXJlY3RvcnkgaXMgY3JlYXRlZCBkeW5hbWljYWxseSBpZiBpdCBkb2Vzbid0IGV4aXQuIA0KYGBge3J9DQppbnB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX0RhdGEiLHNlcCA9ICIiKSkNCm91dHB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX1JlY3Vyc2l2ZV9PdXRwdXQiLHNlcCA9ICIiKSkNCnBpcGVsaW5lX2ZvbGRlcl9yZWN1cnNpdmUocGlwZWxpbmVkX3ByaW50X2hlYXRtYXBfZ3Jvd3RoX3NjYWxlZCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKCJOMTA6WDE2IiksDQogICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVfdHlwZSA9ICJ4bHN4IiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgcGFyYWxsZWxfcnVuID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA4LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBlbnZpcm9ubWVudCA9IGxzZi5zdHIoKSkNCmBgYA0KDQpOb3RlLCBpZiB5b3Ugd291bGQgbGlrZSB0byBwdXQgdGhlIHNhbXBsZSBkYXRhIG5leHQgdG8gdGhlIG91dHB1dCwganVzdCB1c2UgdGhlIHNhbWUgaW5wdXQgYW5kIG91dHB1dCBkaXJlY3RvcnkuIFRoaXMgaXMgZ2l2ZW4gYmVsb3c6DQpgYGB7cn0NCmlucHV0X2RpcmVjdG9yeSA9IHRvU3RyaW5nKHBhc3RlKGdldHdkKCksIi9TYW1wbGVfRGF0YSIsc2VwID0gIiIpKQ0Kb3V0cHV0X2RpcmVjdG9yeSA9IGlucHV0X2RpcmVjdG9yeQ0KcGlwZWxpbmVfZm9sZGVyX3JlY3Vyc2l2ZShwaXBlbGluZWRfcHJpbnRfaGVhdG1hcF9ncm93dGhfc2NhbGVkLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9kaXJlY3RvcnksDQogICAgICAgICAgICAgICAgICAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksDQogICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9IGMoIk4xMDpYMTYiKSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZV90eXBlID0gInhsc3giLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBwYXJhbGxlbF9ydW4gPSBUUlVFLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBjb3JlcyA9IDgsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGVudmlyb25tZW50ID0gbHNmLnN0cigpKQ0KYGBgDQoNClJ1biBhbGwgYW5hbHlzaXMgYW5kIHBsYWNlIHRoZSBmaWxlcyBpbnRvIGEgbWFpbiBmb2xkZXIgdGhhdCBjb250YWlucyBhbGwgdGhlIG5lc3RlZCBmaWxlcy4NCkNhbiBydW4gaW4gcGFyYWxsZWwgb3Igc2VxdWVudGlhbGx5LiBOb3RlIG9ubHkgdGhlIGFuYWx5c2lzIGluIGluZGl2aWR1YWwgZm9sZGVycyBpcyBydW4gaW4gcGFyYWxsZWwNCmBgYHtyfQ0KaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9EYXRhIixzZXAgPSAiIikpDQpvdXRwdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9PdXRwdXRzL1NhbXBsZV9SZWN1cnNpdmVfQ29tYmluZWQiLHNlcCA9ICIiKSkNCnBpcGVsaW5lX2ZvbGRlcl9jb21iaW5lKHBpcGVsaW5lZF9wcmludF9oZWF0bWFwX2dyb3d0aF9vdXRsaWVyX2VsaW0sDQogICAgICAgICAgICAgICAgICAgICAgICAgIGlucHV0X2RpcmVjdG9yeSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgb3V0cHV0X2RpcmVjdG9yeSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgYWRkaXRpb25hbF9hcmdzID0gYygiTjEwOlgxNiIpLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBmaWxlX3R5cGUgPSAieGxzeCIsDQogICAgICAgICAgICAgICAgICAgICAgICAgIHBhcmFsbGVsX3J1biA9IFRSVUUsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGNvcmVzID0gOCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgZW52aXJvbm1lbnQgPSBsc2Yuc3RyKCkpDQpgYGANCg0KDQojIFN5bmVyZ3kgRnVuY3Rpb25zIHVzaW5nIEJpb0MNCg0KVGhhbmtzIENsaW50IGZvciBtYWtpbmcgdGhpcyBwYXJ0IQ0KDQojIyBJbXBvcnQgdGhlIERhdGEgYXMgYSBTeW5lcmd5IERhdGEgRnJhbWUNCg0KaW5wdXRfZmlsZSBzaG91bGQgYmUgYW4geGxzeCBmaWxlIGFuZCB0aGUgcmFuZ2UgZGVmaW5lcyB3aGVyZSB0aGUgZ3Jvd3RoIGRhdGEgaXMgYXQuDQpgYGB7cn0NCmlucHV0X2ZpbGUgPSAiU2FtcGxlX0RhdGEvU2FtcGxlX0V4Y2VsX1RlbXBsYXRlLnhsc3giDQpkYXRhX2ZyYW1lcyA8LSBidWlsZF9kYXRhX2ZyYW1lKGlucHV0X2ZpbGUsIHJhbmdlPSJOMTA6WDE2IiwgVmlhYmlsaXR5X0RhdGEgPSBUUlVFLCANCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTm9ybWFsaXplID0gVFJVRSwgRHJ1Z19BID0gIkRvY2V0YXhlbCIsIERydWdfQiA9ICJMdW1pbmVzcGliIiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgQ2VsbF9MaW5lID0gIk1pYS1QYUNhLTIiLCBDb25jX0EgPSAidU0iLCBDb25jX0IgPSAidU0iLCByZXBsaWNhdGUgPSAxKQ0KYGBgDQoNCiMjIFByaW50IExvZ2lzdGljIEN1cnZlcyBhbmQgSW5mbGVjdGlvbiBQb2ludHMNCg0KTm90ZSBpZiBGaWxlbmFtZSBpcyBsZWZ0IE5VTEwgaXQgdXNlcyB0aGUgbmFtZSBidWlsdCBpbnRvIHRoZSBkYXRhX2ZyYW1lIGFib3ZlLg0KYGBge3J9DQpwcmludF9sb2dpc3RpY19mdW5jdGlvbihkYXRhX2ZyYW1lcywgDQogICAgICAgICAgICAgICAgICAgICAgICBMb2dpc3RpY19PdXRwdXRfRm9sZGVyID0gIlNhbXBsZV9PdXRwdXRzL1NhbXBsZV9Mb2dpc3RpY19DdXJ2ZXMiLA0KICAgICAgICAgICAgICAgICAgICAgICAgbnVtX3BhcmFtX2xvZ2lzdGljID0gImFsbCIsIGZpbGVuYW1lID0gTlVMTCkNCg0KYGBgDQoNCk5vdGUgaWYgRmlsZW5hbWUgaXMgbGVmdCBOVUxMIGl0IHVzZXMgdGhlIG5hbWUgYnVpbHQgaW50byB0aGUgZGF0YV9mcmFtZSBhYm92ZS4NCmBgYHtyfQ0KcHJpbnRfbG9naXN0aWNfaW5mbGVjdGlvbl9wb2ludHMoZGF0YV9mcmFtZXMsIA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgSW5mbGVjdGlvbl9PdXRwdXRfRm9sZGVyID0gIlNhbXBsZV9PdXRwdXRzL1NhbXBsZV9JbmZsZWN0aW9uX1BvaW50cyIsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBudW1fcGFyYW1fbG9naXN0aWMgPSAiYWxsIiwgZmlsZW5hbWUgPSBOVUxMKQ0KYGBgDQoNCg0KIyMgUHJpbnQgYSBTeW5lcmd5IE1hcA0KDQpzeW5lcmd5X3R5cGUgY2FuIGJlOiAiSFNBIiwgIkxvZXdlIiwgIkJsaXNzIiwgb3IgIlpJUCIgc3luZXJneSBtZXRob2QgKlpJUCBjb21iaW5lcyB0aGUgYXNzdW1wdGlvbnMgb2YgYm90aCBMb2V3ZSBhbmQgQmxpc3MgbW9kZWxzKg0KYGBge3J9DQpzeW5lcmd5X2FuYWx5c2lzKGRhdGFfZnJhbWVzLCBzeW5lcmd5X3R5cGUgPSAiQmxpc3MiLCBPdXRwdXRfRm9sZGVyID0gIlNhbXBsZV9PdXRwdXRzL1NhbXBsZV9TeW5lcmd5IiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVuYW1lID0gTlVMTCkNCmBgYA0KDQojIyBQaXBlbGluZSBTeW5lcmd5IEZ1bmN0aW9ucw0KDQpMb2dpc3RpYyBQaXBlbGluZToNCmBgYHtyfQ0KaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9EYXRhIixzZXAgPSAiIikpDQpvdXRwdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9PdXRwdXRzL1NhbXBsZV9Mb2dpc3RpY19Db21iaW5lIixzZXAgPSAiIikpDQpwaXBlbGluZV9mb2xkZXJfY29tYmluZShwaXBlbGluZWRfTG9naXN0aWNfQ3VydmVzLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9kaXJlY3RvcnksDQogICAgICAgICAgICAgICAgICAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksDQogICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9IGMoIk4xMDpYMTYiLCBUUlVFLCBUUlVFLCAiYWxsIiksDQogICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVfdHlwZSA9ICJ4bHN4IiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgcGFyYWxsZWxfcnVuID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA4LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBlbnZpcm9ubWVudCA9IGxzZi5zdHIoKSkNCmBgYA0KDQpJbmZsZWN0aW9uIFBpcGVsaW5lOg0KYGBge3J9DQppbnB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX0RhdGEiLHNlcCA9ICIiKSkNCm91dHB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX0luZmxlY3Rpb25fQ29tYmluZSIsc2VwID0gIiIpKQ0KcGlwZWxpbmVfZm9sZGVyX2NvbWJpbmUocGlwZWxpbmVkX0luZmxlY3Rpb25fQ3VydmVzLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBpbnB1dF9kaXJlY3RvcnksDQogICAgICAgICAgICAgICAgICAgICAgICAgIG91dHB1dF9kaXJlY3RvcnksDQogICAgICAgICAgICAgICAgICAgICAgICAgIGFkZGl0aW9uYWxfYXJncyA9IGMoIk4xMDpYMTYiLCBUUlVFLCBUUlVFLCAiYWxsIiksDQogICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVfdHlwZSA9ICJ4bHN4IiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgcGFyYWxsZWxfcnVuID0gVFJVRSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgY29yZXMgPSA4LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBlbnZpcm9ubWVudCA9IGxzZi5zdHIoKSkNCmBgYA0KDQpHcmFwaCBQaXBlbGluZToNCmBgYHtyfQ0KaW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9EYXRhIixzZXAgPSAiIikpDQpvdXRwdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9PdXRwdXRzL1NhbXBsZV9TeW5lcmd5X0NvbWJpbmUiLHNlcCA9ICIiKSkNCnBpcGVsaW5lX2ZvbGRlcl9jb21iaW5lKHBpcGVsaW5lZF9TeW5lcmd5X0dyYXBocywNCiAgICAgICAgICAgICAgICAgICAgICAgICAgaW5wdXRfZGlyZWN0b3J5LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBvdXRwdXRfZGlyZWN0b3J5LA0KICAgICAgICAgICAgICAgICAgICAgICAgICBhZGRpdGlvbmFsX2FyZ3MgPSBjKCJOMTA6WDE2IiwgIkJsaXNzIiwgVFJVRSwgVFJVRSksDQogICAgICAgICAgICAgICAgICAgICAgICAgIGZpbGVfdHlwZSA9ICJ4bHN4IiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgcGFyYWxsZWxfcnVuID0gRkFMU0UsDQogICAgICAgICAgICAgICAgICAgICAgICAgIGNvcmVzID0gOCwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgZW52aXJvbm1lbnQgPSBsc2Yuc3RyKCkpDQpgYGANCg0KDQojIyBDb21iaW5lIFN5bmVyZ3kgRmlsZXMNCg0KSGVyZSB3ZSBjb21iaW5lIHRoZSBmaWxlcyBpbiB0aGUgc3luZXJneSBmb2xkZXIgaW50byBvbmUgZGF0YWZyYW1lLg0KV29ya3Mgc3BlY2lmaWNhbGx5IGZvciBhIGRpcmVjdG9yeSBmdWxsIG9mIENTViBmaWxlcyB0aGF0IHdlcmUgcHJvZHVjZWQgaW4gdGhlIGFib3ZlLiANCg0KYGBge3J9DQpJbnB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX1N5bmVyZ3lfQ29tYmluZSIsc2VwID0gIiIpKQ0KY29tYmluZWRfZnJhbWUgPSBDb21iaW5lX1N5bmVyZ3lfRmlsZXMoSW5wdXRfZGlyZWN0b3J5KQ0KYGBgDQoNCkhlcmUgd2UgY2FuIGNvbWJpbmUgdGhlIGZpbGVzIGFuZCByZXByaW50IGEgQ1NWIG9mIHRoZSBjb21iaW5lZCBmaWxlcy4gDQppZiByZW1vdmVfY3N2IGlzIHRydWUsIHRoZW4gZGVzdHJveSB0aGUgZmlsZSBhZnRlciByZWFkaW5nIGl0LiANCmBgYHtyfQ0KSW5wdXRfZGlyZWN0b3J5ID0gdG9TdHJpbmcocGFzdGUoZ2V0d2QoKSwiL1NhbXBsZV9PdXRwdXRzL1NhbXBsZV9TeW5lcmd5X0NvbWJpbmUiLHNlcCA9ICIiKSkNCk91dHB1dF9kaXJlY3RvcnkgPSB0b1N0cmluZyhwYXN0ZShnZXR3ZCgpLCIvU2FtcGxlX091dHB1dHMvU2FtcGxlX1N5bmVyZ3lfQ29tYmluZS9Db21iaW5lZF9TeW5lcmd5IixzZXAgPSAiIikpDQpDb21iaW5lX1N5bmVyZ3lfRmlsZXNfQ1NWKElucHV0X2RpcmVjdG9yeSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgT3V0cHV0X2RpcmVjdG9yeSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgT3V0cHV0X0ZpbGVuYW1lID0gIkNvbWJpbmVkX1N5bmVyZ3kiLA0KICAgICAgICAgICAgICAgICAgICAgICAgICBhbGxvd19vdmVyd3JpdGUgPSBGQUxTRSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgcmVtb3ZlX2NzdiA9IFRSVUUpDQpgYGANCg0K</div>
 
 
 

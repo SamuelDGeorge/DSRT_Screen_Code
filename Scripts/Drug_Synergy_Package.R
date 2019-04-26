@@ -20,14 +20,10 @@ if (!require("readxl")) {
 
 library(tools)
 
-read_xlsx <- readxl::read_xlsx
-heatmap.2 <- gplots::heatmap.2
-file_ext <- tools::file_ext
-
 import_plate <- function(FileName) {
-  ext = file_ext(FileName)
+  ext = tools::file_ext(FileName)
   if (ext == "xlsx"){
-    df <- as.data.frame(read_xlsx(FileName, col_names = TRUE))
+    df <- as.data.frame(readxl::read_xlsx(FileName, col_names = TRUE))
     rows <- as.vector(df[,1])
     df[,1] <- NULL
     rownames(df) <- rows
@@ -50,9 +46,9 @@ import_plate <- function(FileName) {
 }
 
 import_plate_range <- function(FileName, ImportRange) {
-  ext = file_ext(FileName)
+  ext = tools::file_ext(FileName)
   if (ext == "xlsx"){
-    df <- as.data.frame(read_xlsx(FileName, col_names = TRUE, range = ImportRange))
+    df <- as.data.frame(readxl::read_xlsx(FileName, col_names = TRUE, range = ImportRange))
     rows <- as.vector(df[,1])
     df[,1] <- NULL
     rownames(df) <- rows
@@ -259,7 +255,7 @@ print_heatmap_bliss_scaled <- function(growth_effect_matrix,export_name="default
     }
   }
   
-  map = heatmap.2(data_plate, dendrogram = "none",
+  map = gplots::heatmap.2(data_plate, dendrogram = "none",
             Rowv = NA, 
             Colv = NA, 
             xlab = xlabel, 
@@ -295,7 +291,7 @@ print_heatmap_bliss_outlier_elim <- function(growth_effect_matrix,export_name="d
     }
   }
   
-  map = heatmap.2(data_plate, dendrogram = "none",
+  map = gplots::heatmap.2(data_plate, dendrogram = "none",
             Rowv = NA, 
             Colv = NA, 
             xlab = xlabel, 
@@ -402,7 +398,7 @@ print_heatmap_bliss_scaled_parsed <- function(growth_plate,export_name="default_
     }
   }
   
-  map = heatmap.2(data_plate, dendrogram = "none",
+  map = gplots::heatmap.2(data_plate, dendrogram = "none",
             Rowv = NA, 
             Colv = NA, 
             xlab = xlabel, 
@@ -440,7 +436,7 @@ print_heatmap_bliss_outlier_elim_parsed <- function(growth_plate,export_name="de
     }
   }
   
-  heatmap.2(data_plate, dendrogram = "none",
+  gplots::heatmap.2(data_plate, dendrogram = "none",
             Rowv = NA, 
             Colv = NA, 
             xlab = xlabel, 
