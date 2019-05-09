@@ -194,9 +194,6 @@ pipeline_folder_combine(pipelined_Logistic_Curves,
 ```
 
 
-```{r}
-print(getwd())
-```
 
 Inflection Pipeline:
 ```{r}

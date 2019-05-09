@@ -67,8 +67,8 @@ build_data_frame <- function(input_file,range, Viability_Data = TRUE, Normalize 
   
   metadata = data.frame(c(Drug_A), c(Drug_B), c(Cell_Line), c(Conc_A), c(Conc_B), c(replicate))
   names(metadata) = c("DrugA","DrugB", "Cell_Line","DrugA.conc","DrugB.conc","Replicate")
-  y = "Viability"
-  if (Viability_Data){y = "Inhibition"}
+  y = "inhibition"
+  if (Viability_Data){y = "viability"}
   metadata[1,"type"] <- y
   
   ##First isolate the matrix that corresponds to the Response values, and set that to a vector
