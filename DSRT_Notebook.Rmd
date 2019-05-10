@@ -246,3 +246,42 @@ Combine_Synergy_Files_CSV(Input_directory,
                           remove_csv = TRUE)
 ```
 
+## Cell Tox Experiments
+
+Here we build the same frame, but with cell_tox raw data instead
+
+```{r}
+
+frame = build_data_frame_cell_tox(input_file = "Sample_Data_Celltox/Sample_CellTox.xlsx", range = "N2:X8" )
+synergy_analysis(frame, synergy_type = "Bliss", Output_Folder = "Sample_Outputs/Sample_CellTox",
+                           filename = NULL)
+```
+
+## Cell Tox Pipeline
+
+Here we perform synergy analysis with CellTox Pipeline
+
+```{r}
+input_directory = toString(paste(getwd(),"/Sample_Data_CellTox",sep = ""))
+output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_CellTox_Synergy_Combine",sep = ""))
+pipeline_folder_combine(pipelined_Synergy_Graphs_CellTox,
+                          input_directory,
+                          output_directory,
+                          additional_args = c("N2:X8", "Bliss", TRUE, TRUE),
+                          file_type = "xlsx",
+                          parallel_run = FALSE,
+                          cores = 8,
+                          environment = lsf.str())
+```
+
+We can also remove the pipeline in the same way
+```{r}
+Input_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_CellTox_Synergy_Combine",sep = ""))
+Output_directory = toString(paste(getwd(),"/Sample_Outputs/Sample_CellTox_Synergy_Combine/Combined_Synergy",sep = ""))
+Combine_Synergy_Files_CSV(Input_directory,
+                          Output_directory,
+                          Output_Filename = "Combined_Synergy",
+                          allow_overwrite = FALSE,
+                          remove_csv = TRUE)
+```
+

@@ -6,7 +6,7 @@ library(RColorBrewer)
 library(ggplot2)
 library(magrittr)
 library(tools)
-
+library(jsonlite)
 # 
 # if (!require("dplyr")) {
 #   install.packages("dplyr", dependencies = TRUE)
@@ -53,6 +53,133 @@ collect_file_vector_no_ext <- function(FolderPath, file_type){
   files <- list_files_with_exts(FolderPath, file_type, full.names = FALSE)
   return(files)
 }
+
+get_logistic_model <- function(data_frame, num_params){
+  function_ret = nplr::nplr(data_frame$ConcCol, data_frame$Response, silent = TRUE, method = "res", LPweight = 0, npars = num_params) 
+}
+
+import_plate_range <- function(FileName, ImportRange) {
+  ext = tools::file_ext(FileName)
+  if (ext == "xlsx"){
+    df <- as.data.frame(readxl::read_xlsx(FileName, col_names = TRUE, range = ImportRange))
+    rows <- as.vector(df[,1])
+    df[,1] <- NULL
+    rownames(df) <- rows
+    return(as.matrix(df))
+  } else if (ext == "csv"){
+    #range only supported in xlsx files
+    df <- read.csv2(FileName, sep = ',', check.names = FALSE)
+    rows <- as.vector(df[,1])
+    cols <- colnames(df[,2:ncol(df)])
+    df[,1] <- NULL
+    rownames(df) <- rows
+    matrix <- as.matrix(df)
+    matrix <- mapply(matrix, FUN=as.numeric)
+    matrix <- matrix(matrix, ncol = ncol(df), nrow = nrow(df))
+    colnames(matrix) = cols
+    rownames(matrix) = rows
+    return(matrix)
+  } 
+  return(NULL)
+}
+
+build_data_frame_cell_tox <- function(input_file,range, Viability_Data = TRUE, Normalize = TRUE, Drug_A = "Drug_A", Drug_B = "Drug_B", Cell_Line = "Cell", Conc_A = "uM", Conc_B = "uM", replicate = 1){
+  #Input cell counts
+  plate = import_plate_range(input_file, range)
+  plate_sub = plate - plate[1,1]
+  plate_norm = plate_sub / max(plate_sub)
+  plate_norm = 1 - plate_norm
+  plate_norm = cbind(as.numeric(row.names(plate)), plate_norm)
+  plate_norm = rbind(c(0,as.numeric(colnames(plate))), plate_norm)
+  plate_norm[1,1] = "Drug A/ Drug_B"
+  colnames(plate_norm) <- c()
+  rownames(plate_norm) <- c()
+  x <- plate_norm
+  
+  xl <- as.matrix(x)
+  DrugDoseA = na.omit(as.numeric(as.vector(xl[1,2:ncol(xl)])))
+  DrugDoseB = na.omit(as.numeric(as.vector(xl[2:nrow(xl),1])))
+  matrix_x = length(DrugDoseA)
+  matrix_y = length(DrugDoseB)
+  
+  
+  
+  metadata = data.frame(c(Drug_A), c(Drug_B), c(Cell_Line), c(Conc_A), c(Conc_B), c(replicate))
+  names(metadata) = c("DrugA","DrugB", "Cell_Line","DrugA.conc","DrugB.conc","Replicate")
+  y = "inhibition"
+  if (Viability_Data){y = "viability"}
+  metadata[1,"type"] <- y
+  
+  ##First isolate the matrix that corresponds to the Response values, and set that to a vector
+  
+  Response.mat = as.matrix.data.frame(x[2:(matrix_y+1),2:(matrix_x+1)])
+  Response = as.numeric(as.vector(Response.mat))
+  
+  ##Then define the DrugA and DrugB concentration values. Transform those values into a vector of the same length as the Response vector.
+  
+  DrugDoseArep = as.vector(rep(DrugDoseA, each = matrix_y))
+  DrugDoseBrep = as.vector(rep(DrugDoseB, matrix_x))
+  DrugConcA = unique(DrugDoseA)
+  DrugConcB = unique(DrugDoseB)
+  combo_columns = as.numeric(length(DrugConcA))
+  combo_rows = as.numeric(length(DrugConcB))
+  
+  ##Bind the reponse, DrugDoseArep, and DrugDoseBrep vectors. Make sure they are numeric
+  
+  df = as.data.frame(cbind(Response, DrugDoseArep, DrugDoseBrep))
+  df$DrugDoseArep = as.numeric(df$DrugDoseArep)
+  df$DrugDoseBrep = as.numeric(df$DrugDoseBrep)
+  df$Response = as.numeric(df$Response)
+  
+  ##Make a new column that will take in to account any repeat treatments (i.e. extra control cells or if single treatments were run in duplicate)
+  
+  df <- df %>%
+    tidyr::unite(AplusB, DrugDoseArep, DrugDoseBrep, remove = T)
+  
+  ##Then we group the dataframe by repeat treatments and only cary the mean value forward. This will eliminate duplicated treatments
+  
+  df = df %>% 
+    dplyr::group_by(AplusB) %>%
+    dplyr::summarise(Response = mean(Response)) %>%
+    tidyr::separate(AplusB, c("ConcCol","ConcRow"), sep = "_")
+  df$ConcCol = round(as.numeric(df$ConcCol), digits = 2)
+  df$ConcRow = round(as.numeric(df$ConcRow), digits = 2)
+  
+  ## Find the control well and normalize
+  if (Viability_Data) {
+    if(Normalize) {
+      ctrldf = df %>%
+        dplyr::filter(ConcCol==0,ConcRow==0)
+      ctrl=ctrldf$Response[1]
+      df$Response = df$Response/ctrl*100
+    }
+  } else {
+    if(Normalize) {
+      max_response <- max(df$Response)
+      min_response <- min(df$Response)
+      df$Response = (df$Response-min_response)/(max_response-min_response)*100
+    }
+  }
+  
+  ## Now shape the data to the format needed for synergyFinder
+  df = df %>%
+    dplyr::mutate(BlockID = 1) %>%
+    dplyr::mutate(DrugRow = as.character(metadata$DrugB[1])) %>%
+    dplyr::mutate(DrugCol = as.character(metadata$DrugA[1])) %>%
+    dplyr::mutate(ConcRowUnit = as.character(metadata$DrugB.conc)) %>%
+    dplyr::mutate(ConcColUnit = as.character(metadata$DrugA.conc)) %>%
+    as.data.frame(df) %>%
+    dplyr::arrange(ConcCol) %>%
+    dplyr::arrange(ConcRow) %>%
+    dplyr::mutate(Col = rep(1:combo_columns, combo_rows)) %>%
+    dplyr::mutate(Row = rep(1:combo_rows, each = combo_columns))
+  
+  final_list <- list(df, metadata)
+  
+  ## Print data frame and metadata
+  return(final_list)
+}
+
 
 ##The following will get the drug concentrations as a vector, which will define the size of the drug matrix
 build_data_frame <- function(input_file,range, Viability_Data = TRUE, Normalize = TRUE, Drug_A = "Drug_A", Drug_B = "Drug_B", Cell_Line = "Cell", Conc_A = "uM", Conc_B = "uM", replicate = 1){
@@ -364,6 +491,14 @@ pipelined_Synergy_Graphs <- function(InputFilePath, OutputFileName, data_locatio
   data_frames <- try(build_data_frame(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
                                   Normalize = Normalize, Drug_A = "Drug_A", Drug_B = "Drug_B",
                                   Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1))
+  try(synergy_analysis(input_data_frame = data_frames, synergy_type = synergy_type, filename = paste(OutputFileName, "_Synergy", sep = ""),Output_Folder = NULL))
+  if (file.exists("Rplots.pdf")){file.remove("Rplots.pdf")}
+}
+
+pipelined_Synergy_Graphs_CellTox <- function(InputFilePath, OutputFileName, data_location, synergy_type = "Bliss", Normalize = TRUE, Viability_Data = TRUE) {
+  data_frames <- try(build_data_frame_cell_tox(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
+                                      Normalize = Normalize, Drug_A = "Drug_A", Drug_B = "Drug_B",
+                                      Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1))
   try(synergy_analysis(input_data_frame = data_frames, synergy_type = synergy_type, filename = paste(OutputFileName, "_Synergy", sep = ""),Output_Folder = NULL))
   if (file.exists("Rplots.pdf")){file.remove("Rplots.pdf")}
 }
