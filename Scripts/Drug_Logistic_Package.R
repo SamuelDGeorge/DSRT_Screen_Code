@@ -321,7 +321,7 @@ build_data_frame_cell_tox <- function(input_file,range, Viability_Data = TRUE, N
 }
 
 build_data_frame_cell_tox_outlier_removal <- function(input_file,range, Viability_Data = TRUE, Normalize = TRUE, Drug_A = "Drug_A", Drug_B = "Drug_B", Cell_Line = "Cell", Conc_A = "uM", Conc_B = "uM", replicate = 1){
-  #Input cell counts
+  #Remove outliers
   bad_data =  import_plate_range(input_file, range)
   bad_data_norm = bad_data - bad_data[1,1]
   bad_data_clear = drop_negative_drug_alone(bad_data_norm)
