@@ -58,6 +58,146 @@ get_logistic_model <- function(data_frame, num_params){
   function_ret = nplr::nplr(data_frame$ConcCol, data_frame$Response, silent = TRUE, method = "res", LPweight = 0, npars = num_params) 
 }
 
+drop_negative_drug_alone <- function(data_frame){
+  to_remove = c()
+  for (i in 1:ncol(data_frame)){
+    if (as.numeric(data_frame[1,i]) < 0){
+      to_remove = c(to_remove, i)
+    }
+  }
+  
+  data_frame = data_frame[,-to_remove]
+  
+  to_remove = c()
+  for (i in 1:nrow(data_frame)){
+    if (as.numeric(data_frame[i,1]) < 0){
+      to_remove = c(to_remove, i)
+    }
+  }
+  
+  data_frame = data_frame[-to_remove,]
+  return(data_frame)
+}
+
+collect_surrounding_points <- function(data_frame, row_pos, col_pos){
+  r_up = row_pos - 1
+  r_down = row_pos + 1
+  col_left = col_pos - 1
+  col_right = col_pos + 1
+  
+  point_array = c()
+  
+  if ((r_up > 0)){
+    if (!is.na(data_frame[r_up, col_pos])){
+      point_array = c(point_array, data_frame[r_up, col_pos])
+    }
+  }
+  
+  if ((r_up > 0) & (col_left > 0)){
+    if (!is.na(data_frame[r_up, col_left])){
+    point_array = c(point_array, data_frame[r_up, col_left])
+    }
+  }
+  
+  if ((r_up > 0) & (col_right <= ncol(data_frame))){
+    if (!is.na(data_frame[r_up, col_right])){
+    point_array = c(point_array, data_frame[r_up, col_right])
+    }
+  }
+  
+  if ((col_left > 0)){
+    if (!is.na(data_frame[row_pos, col_left])){
+    point_array = c(point_array, data_frame[row_pos, col_left])
+    }
+  }
+  
+  if ((col_right <= ncol(data_frame))){
+    if (!is.na(data_frame[row_pos, col_right])){
+    point_array = c(point_array, data_frame[row_pos, col_right])
+    }
+  }
+  
+  if ((r_down <= nrow(data_frame))){
+    if (!is.na(data_frame[r_down, col_pos])){
+    point_array = c(point_array, data_frame[r_down, col_pos])
+    }
+  }
+  
+  if ((r_down <= nrow(data_frame)) & (col_left > 0)){
+    if (!is.na(data_frame[r_down, col_left])){
+    point_array = c(point_array, data_frame[r_down,col_left])
+    }
+  }
+  
+  if ((r_down <= nrow(data_frame)) & (col_right <= ncol(data_frame))){
+    if (!is.na(data_frame[r_down, col_right])){
+    point_array = c(point_array, data_frame[r_down, col_right])
+    }
+  }
+  
+  return(point_array)
+}
+
+clear_outlier_points <- function(data_frame, start_row, start_column){
+  for (row in start_row:nrow(data_frame)){
+    for (column in start_column:ncol(data_frame)){
+      surrounding_points = collect_surrounding_points(data_frame, row, column)
+      mean = mean(surrounding_points)
+      st_dev = sd(surrounding_points)
+      current_point = data_frame[row, column]
+      left = mean - st_dev
+      right = mean + st_dev
+      if ((current_point < left) | (current_point > right)){
+        data_frame[row, column] <- NA
+      }
+      
+    }
+  }
+  return(data_frame)
+}
+
+drop_all_na_row_and_columns <- function(data_frame){
+  rows_to_keep = c(1)
+  columns_to_keep = c(1)
+  
+  for (row in 2:nrow(data_frame)){
+    for (column in 2:ncol(data_frame)){
+      if (!is.na(data_frame[row, column])){
+        if (!any(rows_to_keep == row)){
+          rows_to_keep = c(rows_to_keep, row)
+        } 
+      }
+    }
+  }
+  normalize_final = data_frame[sort(rows_to_keep),]
+  for (row in 2:nrow(normalize_final)){
+    for (column in 2:ncol(normalize_final)){
+      if (!is.na(normalize_final[row, column])){
+        if (!any(columns_to_keep == column)){
+          columns_to_keep = c(columns_to_keep, column)
+        } 
+      }
+    }
+  }
+  
+  normalize_final = normalize_final[,sort(columns_to_keep)]
+  return(normalize_final)
+}
+
+impute_neutral_score <- function(data_frame){
+  for (row in 2:nrow(data_frame)){
+    for (column in 2:ncol(data_frame)){
+      if (is.na(data_frame[row, column])){
+        a = data_frame[row, 1]
+        b = data_frame[1, column]
+        value = ((a + b) - (a*b))
+        data_frame[row,column] <- value
+      }
+    }
+  }
+  return(data_frame)
+}
+
 import_plate_range <- function(FileName, ImportRange) {
   ext = tools::file_ext(FileName)
   if (ext == "xlsx"){
@@ -142,8 +282,8 @@ build_data_frame_cell_tox <- function(input_file,range, Viability_Data = TRUE, N
     dplyr::group_by(AplusB) %>%
     dplyr::summarise(Response = mean(Response)) %>%
     tidyr::separate(AplusB, c("ConcCol","ConcRow"), sep = "_")
-  df$ConcCol = round(as.numeric(df$ConcCol), digits = 2)
-  df$ConcRow = round(as.numeric(df$ConcRow), digits = 2)
+  df$ConcCol = round(as.numeric(df$ConcCol), digits = 8)
+  df$ConcRow = round(as.numeric(df$ConcRow), digits = 8)
   
   ## Find the control well and normalize
   if (Viability_Data) {
@@ -152,6 +292,112 @@ build_data_frame_cell_tox <- function(input_file,range, Viability_Data = TRUE, N
         dplyr::filter(ConcCol==0,ConcRow==0)
       ctrl=ctrldf$Response[1]
       df$Response = df$Response/ctrl*100
+    }
+  } else {
+    if(Normalize) {
+      max_response <- max(df$Response)
+      min_response <- min(df$Response)
+      df$Response = (df$Response-min_response)/(max_response-min_response)*100
+    }
+  }
+  
+  ## Now shape the data to the format needed for synergyFinder
+  df = df %>%
+    dplyr::mutate(BlockID = 1) %>%
+    dplyr::mutate(DrugRow = as.character(metadata$DrugB[1])) %>%
+    dplyr::mutate(DrugCol = as.character(metadata$DrugA[1])) %>%
+    dplyr::mutate(ConcRowUnit = as.character(metadata$DrugB.conc)) %>%
+    dplyr::mutate(ConcColUnit = as.character(metadata$DrugA.conc)) %>%
+    as.data.frame(df) %>%
+    dplyr::arrange(ConcCol) %>%
+    dplyr::arrange(ConcRow) %>%
+    dplyr::mutate(Col = rep(1:combo_columns, combo_rows)) %>%
+    dplyr::mutate(Row = rep(1:combo_rows, each = combo_columns))
+  
+  final_list <- list(df, metadata)
+  
+  ## Print data frame and metadata
+  return(final_list)
+}
+
+build_data_frame_cell_tox_outlier_removal <- function(input_file,range, Viability_Data = TRUE, Normalize = TRUE, Drug_A = "Drug_A", Drug_B = "Drug_B", Cell_Line = "Cell", Conc_A = "uM", Conc_B = "uM", replicate = 1){
+  #Input cell counts
+  bad_data =  import_plate_range(input_file, range)
+  bad_data_norm = bad_data - bad_data[1,1]
+  bad_data_clear = drop_negative_drug_alone(bad_data_norm)
+  fixed_frame = clear_outlier_points(bad_data_clear, 2, 2)
+  normalize = fixed_frame / max(fixed_frame,na.rm = TRUE)
+  normalize[normalize < 0] <- NA
+  normalize = drop_all_na_row_and_columns(normalize)
+  normalize = impute_neutral_score(normalize)
+  normalize = 1 - normalize
+  
+  
+  
+  #reconfigure plate
+  plate_norm = cbind(as.numeric(row.names(normalize)), normalize)
+  plate_norm = rbind(c(0,as.numeric(colnames(normalize))), plate_norm)
+  plate_norm[1,1] = "Drug A/Drug B"
+  colnames(plate_norm) <- c()
+  rownames(plate_norm) <- c()
+  x <- plate_norm
+  
+  xl <- as.matrix(x)
+  DrugDoseA = na.omit(as.numeric(as.vector(xl[1,2:ncol(xl)])))
+  DrugDoseB = na.omit(as.numeric(as.vector(xl[2:nrow(xl),1])))
+  matrix_x = length(DrugDoseA)
+  matrix_y = length(DrugDoseB)
+  
+  
+  
+  metadata = data.frame(c(Drug_A), c(Drug_B), c(Cell_Line), c(Conc_A), c(Conc_B), c(replicate))
+  names(metadata) = c("DrugA","DrugB", "Cell_Line","DrugA.conc","DrugB.conc","Replicate")
+  y = "inhibition"
+  if (Viability_Data){y = "viability"}
+  metadata[1,"type"] <- y
+  
+  ##First isolate the matrix that corresponds to the Response values, and set that to a vector
+  
+  Response.mat = as.matrix.data.frame(x[2:(matrix_y+1),2:(matrix_x+1)])
+  Response = as.numeric(as.vector(Response.mat))
+  
+  ##Then define the DrugA and DrugB concentration values. Transform those values into a vector of the same length as the Response vector.
+  
+  DrugDoseArep = as.vector(rep(DrugDoseA, each = matrix_y))
+  DrugDoseBrep = as.vector(rep(DrugDoseB, matrix_x))
+  DrugConcA = unique(DrugDoseA)
+  DrugConcB = unique(DrugDoseB)
+  combo_columns = as.numeric(length(DrugConcA))
+  combo_rows = as.numeric(length(DrugConcB))
+  
+  ##Bind the reponse, DrugDoseArep, and DrugDoseBrep vectors. Make sure they are numeric
+  
+  df = as.data.frame(cbind(Response, DrugDoseArep, DrugDoseBrep))
+  df$DrugDoseArep = as.numeric(df$DrugDoseArep)
+  df$DrugDoseBrep = as.numeric(df$DrugDoseBrep)
+  df$Response = as.numeric(df$Response)
+  
+  ##Make a new column that will take in to account any repeat treatments (i.e. extra control cells or if single treatments were run in duplicate)
+  
+  df <- df %>%
+    tidyr::unite(AplusB, DrugDoseArep, DrugDoseBrep, remove = T)
+  
+  ##Then we group the dataframe by repeat treatments and only cary the mean value forward. This will eliminate duplicated treatments
+  
+  df = df %>% 
+    dplyr::group_by(AplusB) %>%
+    dplyr::summarise(Response = mean(Response)) %>%
+    tidyr::separate(AplusB, c("ConcCol","ConcRow"), sep = "_")
+  df$ConcCol = round(as.numeric(df$ConcCol), digits = 8)
+  df$ConcRow = round(as.numeric(df$ConcRow), digits = 8)
+  
+  ## Find the control well and normalize
+  if (Viability_Data) {
+    if(Normalize) {
+      ctrldf = df %>%
+        dplyr::filter(ConcCol==0,ConcRow==0)
+      ctrl=ctrldf$Response[1]
+      df$Response = (df$Response/ctrl)*100
     }
   } else {
     if(Normalize) {
@@ -230,8 +476,8 @@ build_data_frame <- function(input_file,range, Viability_Data = TRUE, Normalize 
     dplyr::group_by(AplusB) %>%
     dplyr::summarise(Response = mean(Response)) %>%
     tidyr::separate(AplusB, c("ConcCol","ConcRow"), sep = "_")
-  df$ConcCol = round(as.numeric(df$ConcCol), digits = 2)
-  df$ConcRow = round(as.numeric(df$ConcRow), digits = 2)
+  df$ConcCol = round(as.numeric(df$ConcCol), digits = 8)
+  df$ConcRow = round(as.numeric(df$ConcRow), digits = 8)
 
   ## Find the control well and normalize
   if (Viability_Data) {
@@ -499,6 +745,14 @@ pipelined_Synergy_Graphs_CellTox <- function(InputFilePath, OutputFileName, data
   data_frames <- try(build_data_frame_cell_tox(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
                                       Normalize = Normalize, Drug_A = "Drug_A", Drug_B = "Drug_B",
                                       Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1))
+  try(synergy_analysis(input_data_frame = data_frames, synergy_type = synergy_type, filename = paste(OutputFileName, "_Synergy", sep = ""),Output_Folder = NULL))
+  if (file.exists("Rplots.pdf")){file.remove("Rplots.pdf")}
+}
+
+pipelined_Synergy_Graphs_CellTox_Outlier_Removal <- function(InputFilePath, OutputFileName, data_location, synergy_type = "Bliss", Normalize = TRUE, Viability_Data = TRUE) {
+  data_frames <- try(build_data_frame_cell_tox_outlier_removal(InputFilePath, range=data_location, Viability_Data = Viability_Data, 
+                                               Normalize = Normalize, Drug_A = "Drug_A", Drug_B = "Drug_B",
+                                               Cell_Line = "Cell_Line", Conc_A = "uM", Conc_B = "uM", replicate = 1))
   try(synergy_analysis(input_data_frame = data_frames, synergy_type = synergy_type, filename = paste(OutputFileName, "_Synergy", sep = ""),Output_Folder = NULL))
   if (file.exists("Rplots.pdf")){file.remove("Rplots.pdf")}
 }

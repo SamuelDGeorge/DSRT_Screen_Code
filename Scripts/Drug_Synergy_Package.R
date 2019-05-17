@@ -91,6 +91,104 @@ un_craig_plate <- function(Plate) {
   return(fixed_plate)
 }
 
+drop_negative_drug_alone <- function(data_frame){
+  to_remove = c()
+  for (i in 1:ncol(data_frame)){
+    if (as.numeric(data_frame[1,i]) < 0){
+      to_remove = c(to_remove, i)
+    }
+  }
+  
+  data_frame = data_frame[,-to_remove]
+  
+  to_remove = c()
+  for (i in 1:nrow(data_frame)){
+    if (as.numeric(data_frame[i,1]) < 0){
+      to_remove = c(to_remove, i)
+    }
+  }
+  
+  data_frame = data_frame[-to_remove,]
+  return(data_frame)
+}
+
+collect_surrounding_points <- function(data_frame, row_pos, col_pos){
+  r_up = row_pos - 1
+  r_down = row_pos + 1
+  col_left = col_pos - 1
+  col_right = col_pos + 1
+  
+  point_array = c()
+  
+  if ((r_up > 0)){
+    if (!is.na(data_frame[r_up, col_pos])){
+      point_array = c(point_array, data_frame[r_up, col_pos])
+    }
+  }
+  
+  if ((r_up > 0) & (col_left > 0)){
+    if (!is.na(data_frame[r_up, col_left])){
+      point_array = c(point_array, data_frame[r_up, col_left])
+    }
+  }
+  
+  if ((r_up > 0) & (col_right <= ncol(data_frame))){
+    if (!is.na(data_frame[r_up, col_right])){
+      point_array = c(point_array, data_frame[r_up, col_right])
+    }
+  }
+  
+  if ((col_left > 0)){
+    if (!is.na(data_frame[row_pos, col_left])){
+      point_array = c(point_array, data_frame[row_pos, col_left])
+    }
+  }
+  
+  if ((col_right <= ncol(data_frame))){
+    if (!is.na(data_frame[row_pos, col_right])){
+      point_array = c(point_array, data_frame[row_pos, col_right])
+    }
+  }
+  
+  if ((r_down <= nrow(data_frame))){
+    if (!is.na(data_frame[r_down, col_pos])){
+      point_array = c(point_array, data_frame[r_down, col_pos])
+    }
+  }
+  
+  if ((r_down <= nrow(data_frame)) & (col_left > 0)){
+    if (!is.na(data_frame[r_down, col_left])){
+      point_array = c(point_array, data_frame[r_down,col_left])
+    }
+  }
+  
+  if ((r_down <= nrow(data_frame)) & (col_right <= ncol(data_frame))){
+    if (!is.na(data_frame[r_down, col_right])){
+      point_array = c(point_array, data_frame[r_down, col_right])
+    }
+  }
+  
+  return(point_array)
+}
+
+clear_outlier_points <- function(data_frame, start_row, start_column){
+  for (row in start_row:nrow(data_frame)){
+    for (column in start_column:ncol(data_frame)){
+      surrounding_points = collect_surrounding_points(data_frame, row, column)
+      mean = mean(surrounding_points)
+      st_dev = sd(surrounding_points)
+      current_point = data_frame[row, column]
+      left = mean - st_dev
+      right = mean + st_dev
+      if ((current_point < left) | (current_point > right)){
+        data_frame[row, column] <- NA
+      }
+      
+    }
+  }
+  return(data_frame)
+}
+
 growth_effect_calculator <- function(raw_growth, column_to_normalize_by = 1, row_to_normalize_by = 1){
   growth_plate <- raw_growth/raw_growth[row_to_normalize_by,column_to_normalize_by]
   return(growth_plate)

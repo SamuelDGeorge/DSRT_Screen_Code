@@ -136,7 +136,6 @@ pipeline_folder_combine(pipelined_print_heatmap_growth_outlier_elim,
                           environment = lsf.str())
 ```
 
-
 # Synergy Functions using BioC
 
 Thanks Clint for making this part!
@@ -150,6 +149,17 @@ data_frames <- build_data_frame(input_file, range="N10:X16", Viability_Data = TR
                                 Normalize = TRUE, Drug_A = "Docetaxel", Drug_B = "Luminespib",
                                 Cell_Line = "Mia-PaCa-2", Conc_A = "uM", Conc_B = "uM", replicate = 1)
 ```
+
+## Import the data that needs to have outliers removed
+
+Input the bad file and build data frame with outliers removed.
+```{r}
+input_file = "Sample_Data_Correction/Sample_Correction.xlsx"
+data_frames <- build_data_frame_cell_tox_outlier_removal(input_file, range="N2:X8", Viability_Data = TRUE, 
+                                Normalize = TRUE, Drug_A = "Docetaxel", Drug_B = "Luminespib",
+                                Cell_Line = "Mia-PaCa-2", Conc_A = "uM", Conc_B = "uM", replicate = 1)
+```
+
 
 ## Print Logistic Curves and Inflection Points
 
@@ -174,6 +184,12 @@ print_logistic_inflection_points(data_frames,
 synergy_type can be: "HSA", "Loewe", "Bliss", or "ZIP" synergy method *ZIP combines the assumptions of both Loewe and Bliss models*
 ```{r}
 synergy_analysis(data_frames, synergy_type = "Bliss", Output_Folder = "Sample_Outputs/Sample_Synergy",
+                           filename = NULL)
+```
+
+```{r}
+source("Scripts/Drug_Logistic_Package.R")
+output = synergy_analysis(data_frames, synergy_type = "Bliss", Output_Folder = "Sample_Outputs/Sample_Correction",
                            filename = NULL)
 ```
 
